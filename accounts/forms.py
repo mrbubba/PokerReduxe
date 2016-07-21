@@ -1,12 +1,13 @@
 from django import forms
 from .models import Register as RegModel
+from django.contrib.auth.models import User
 
 
 class RegisterForm(forms.ModelForm):
 
     class Meta:
 
-        model = RegModel
+        model = User
         fields = ['user_name', 'password']
 
 """  def clean_user_name(self):
