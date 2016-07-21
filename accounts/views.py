@@ -21,3 +21,9 @@ def register(request):
 
 
     return render(request, template, context)
+
+
+def login(request):
+
+    template = 'accounts/login.html'
+    login_form = LoginForm(request.POST)
