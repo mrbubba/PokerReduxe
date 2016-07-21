@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 
-from .forms import RegisterForm
+from .forms import RegisterForm, LoginForm
 # Create your views here.
 
 
@@ -26,20 +27,22 @@ class RegisterView(TemplateView):
         return render(request, self.template_name, { 'register_form': self.register_form })
 
 
-def register(request):
+class LoginView(TemplateView):
+    allowed_methods = ["post", "get"]
+    template_name = 'accounts/login.html'
+    def post(self, request, *args, **kargs):
+        form = LoginForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, { "login_form": form })
 
-    template = 'accounts/register.html'
-    register_form = RegisterForm(request.POST or None)
+        user = authenticate(username=form.cleaned_data["user_name"], password=form.cleaned_data["password"])
 
-    context = {'register_form': register_form}
+        if user is None:
+            # TODO: Add custom error message to form as non_field_error
+            return render(request, self.template_name, { "login_form": form })
+        login(request, user)
+        return redirect("/lobby")
 
-    if register_form.is_valid():
-        user_name = register_form.cleaned_data.get('user_name')
-        password = register_form.cleaned_data.get('password')
-        user = User.objects.create_user(user_name, password)
-        user.save()
-
-        context = {'Thanks': "Thanks for the memories"}
-
-
-    return render(request, template, context)
+    def get(self, request, *args, **kargs):
+        form = LoginForm()
+        return render(request, self.template_name, { "login_form": form } )
