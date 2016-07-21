@@ -1,7 +1,29 @@
 from django.shortcuts import render
-from .forms import RegisterForm
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.views.generic.base import TemplateView
+
+from .forms import RegisterForm
 # Create your views here.
+
+
+class RegisterView(TemplateView):
+    allowed_methods = ["post", "get"]
+    template_name = 'accounts/register.html'
+    register_form = RegisterForm()
+    def post(self, request, *args, **kargs):
+        form = RegisterForm(request.POST)
+        is_valid = form.is_valid()
+
+        if is_valid is False:
+            return render(request, self.template_name, { 'register_form': form })
+        else:
+            # redirect logic
+            pass
+
+
+    def get(self, request, *args, **kargs):
+        return render(request, self.template_name, { 'register_form': self.register_form })
 
 
 def register(request):
