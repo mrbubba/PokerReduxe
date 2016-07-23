@@ -1,0 +1,26 @@
+can not play the button if any missed blinds (skip a turn)
+if a player changes seats away from the button (assuming active seats
+are jumped) must post big and small
+must post missed blinds or wait for the big
+
+seat 1 = button
+seat 2 = inactive
+seat 3 = inactive
+seat 4 = inactive
+seat 5 = small
+seat 6 = big
+
+scenario 1
+seat 2 post big and small(small is dead)
+        buttons don't pay or move
+
+scenario 2
+seat 2 posts big and small blind
+seat 3 posts big blind
+blinds are moved to seat 2 and 3 respectively
+
+scenario 3
+seat 2 posts big and small blind
+seat 3 posts big blind
+blinds are moved to seat 2 and 3 respectively
+seat 4 posts big and small  and is utg
