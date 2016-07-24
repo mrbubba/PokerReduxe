@@ -1,11 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
+
+
+from .gamelogic.table import Table
 
 
 class Hand(models.Model):
     """Hand gets created at the start of every hand"""
     table = models.ForeignKey(Table)
-    start = models.DateTimeField(start=start)
+    start = models.DateTimeField(default=datetime.datetime.now)
 
 
 class DealerAction(models.Model):
