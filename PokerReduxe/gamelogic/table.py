@@ -1,5 +1,8 @@
 import random
-from pot import Pot
+
+
+from .pot import Pot
+from .dealer import Dealer
 
 
 class Table(object):
@@ -41,7 +44,7 @@ class Table(object):
     def __init__(self, seats, small_blind_amount, big_blind_amount, ante=0):
         self.community_cards = []
         self.seats = seats
-        self.seats_active = None
+        # redundant self.seats_active = None
         self.small_blind_amount = small_blind_amount
         self.big_blind_amount = big_blind_amount
         self.ante = ante
@@ -50,7 +53,7 @@ class Table(object):
         self.big_blind = None
         self.under_the_gun = None
         self.pots = []
-        self.dealer = None
+        self.dealer = Dealer(self)
         self.bought_button = None
         self.first = None
 
@@ -306,7 +309,7 @@ class Table(object):
 
         bb = self.seats[self.big_blind]
         sb = self.seats[self.small_blind]
-        all_in = []
+        # as per conversation with Jared this is unneeded all_in = []
         pot = 0
         active_seats = self._get_active_seats()
 
@@ -325,8 +328,6 @@ class Table(object):
                 buyer.player.equity = self.big_blind
                 pot += buyer.player.stack
                 buyer.player.stack = 0
-                buyer.active = False
-                all_in.append(buyer)
         else:
             if sb.active:
 
@@ -343,16 +344,12 @@ class Table(object):
                         pot += sb.player.stack
                         sb.player.stack = 0
                         sb.player.equity = self.big_blind_amount
-                        sb.active = False
-                        all_in.append(sb)
                         sb.player.missed_big_blind = False
 
                     else:
                         pot += sb.player.stack
                         sb.player.equity = sb.player.stack
                         sb.player.stack = 0
-                        sb.active = False
-                        all_in.append(sb)
                         sb.player.missed_big_blind = False
 
                 elif sb.player.stack > self.small_blind_amount:
@@ -365,8 +362,6 @@ class Table(object):
                     pot += sb.player.stack
                     sb.player.equity = sb.player.stack
                     sb.player.stack = 0
-                    sb.active = False
-                    all_in.append(sb)
 
             # add the big blind to the pot
             if bb.player.stack > self.big_blind_amount:
@@ -381,8 +376,6 @@ class Table(object):
                 pot += bb.player.stack
                 bb.player.equity = bb.player.stack
                 bb.player.stack = 0
-                bb.active = False
-                all_in.append(sb)
                 bb.player.missed_big_blind = False
                 bb.player.missed_small_blind = False
 
@@ -401,7 +394,6 @@ class Table(object):
                     pot += seat.player.stack
                     seat.player.stack = 0
                     seat.active = False
-                    all_in.append(seat)
                     seat.player.missed_small_blind = False
                     seat.player.missed_big_blind = False
 
@@ -421,30 +413,24 @@ class Table(object):
                         seat.player.equity = seat.player.stack
                     pot += seat.player.stack
                     seat.player.stack = 0
-                    seat.active = False
-                    all_in.append(seat)
                     seat.player.missed_small_blind = False
 
         # if there is an ante add it too the pot
         if self.ante > 0:
             for seat in active_seats:
-                if seat.player.stack > self.ante:
+                if seat.player.stack >= self.ante:
                     seat.player.stack -= self.ante
                     pot += self.ante
                 else:
-                    # if ante puts player all in put player in all_in list
                     pot += seat.player.stack
                     seat.player.stack = 0
-                    seat.active = False
-                    if seat.player.equity > 0:
-                        all_in.append(seat)
 
-        # (pot, init_increment, increment, seats, all_in, bet, utg, first, table)
-        pot = Pot(pot, self.big_blind_amount, self.big_blind_amount,
-                  self.seats, all_in, self.big_blind_amount,
-                  self.under_the_gun, self.first, self)
+        # (pot, init_increment, increment, seats, bet, utg, first, table)
+        seats = self._get_active_seats()
+
+        pot = Pot(pot, self.big_blind_amount, self.big_blind_amount, seats,
+                  self.big_blind_amount, self.under_the_gun, self.first, self)
         self.pots.append(pot)
-        return pot
 
     def _reset_players(self):
         # set player attributes for start of new hand

@@ -1,4 +1,4 @@
-__author__ = 'mark'
+from .analyzer import Analyzer
 
 
 class Pot(object):
@@ -28,16 +28,18 @@ class Pot(object):
 
     """
 
-    def __init__(self, pot, init_increment, increment, seats, all_in, bet, utg, first, table):
+    def __init__(self, pot, init_increment, increment, seats, bet, utg, first, table):
         self.pot = pot
         self.init_increment = init_increment
         self.increment = increment
         self.seats = seats
-        self.all_in = all_in
         self.bet = bet
         self.utg = utg
         self.first = first
         self.table = table
+
+    def _new_pot(self):
+        pass
 
     def betting_round(self):
         """we need a round of betting.  Must appropriately tell players to act,
@@ -48,6 +50,9 @@ class Pot(object):
         # are we in the middle of an active round of betting?
         # If so increment to the next active player
         for seat in self.seats:
+            # Do we have more than one person left in the hand?
+            if len(self.seats) == 1:
+                return Analyzer(self.table)
             if seat.player.action:
                 seat.player.action = False
                 i = self.seats.index(seat)
@@ -55,8 +60,15 @@ class Pot(object):
                 if i == len(self.seats):
                     i = 0
                 self.seats[i].player.action = True
-                return
-
+                if self.bet == 0 and i == self.first:
+                    self.table.dealer.deal()
+                    return
+                elif i == self.utg and self.bet == self.init_increment:
+                    self.table.dealer.deal()
+                    return
+                elif self.bet > self.init_increment and self.bet == self.seats[i].player.equity:
+                    self.table.dealer.deal()
+                    return
         # if no community cards have been dealt utg is first to act
         if not self.table.community_cards:
             self.seats[self.utg].player.action = True

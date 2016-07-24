@@ -39,16 +39,16 @@ class Dealer(object):
                 active_players.append(seat.player)
         return active_players
 
-    def _reset_players_acted(self):
+    def _reset_players_action(self):
         """before we deal any betting round we have to reset the players .active 
         to False"""
         for seat in self.table.seats:
-            seat.player.acted = False
+            # can't find this attribute on the player object seat.player.acted = False
             seat.player.action = False
 
     def deal_hole(self):
         """Deals the two hole cards to all active players"""
-        self._reset_players_acted()
+        self._reset_players_action()
         pot = self.table.pots[len(self.table.pots) - 1]
         active_players = self._get_active_players()
         self.deck.create()
@@ -59,7 +59,7 @@ class Dealer(object):
         pot.betting_round()
 
     def deal(self):
-        self._reset_players_acted()
+        self._reset_players_action()
         pot = self.table.pots[len(self.table.pots) - 1]
         if len(self.table.community_cards) == 0:
             for i in range(3):

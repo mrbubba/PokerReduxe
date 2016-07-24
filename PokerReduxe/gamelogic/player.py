@@ -1,7 +1,7 @@
 from madehand import HandUnit
 
 
-class Player(object):
+class Player(Object):
     """The player object
     Attributes:
 
@@ -19,7 +19,7 @@ class Player(object):
                        to play this hand(Player will be inactive for the hand.)
         hot_seat(bool): indicates that action is on the player
 
-        hand(str): the final old_poker hand as set by Analyzer
+        hand(str): the final poker hand as set by Analyzer
 
 
     Methods:
@@ -56,6 +56,7 @@ class Player(object):
     # Allows player to sit in or out of a hand.  If player is in a hand they fold
     # They will rejoin on the next hand
     def play(self):
+        """allows player to set his seat to active or inactive"""
         if self.seat.active:
             self.seat.active = False
         else:
@@ -67,14 +68,6 @@ class Player(object):
             self.equity += amount
             self.table.pots[-1].pot += amount
 
-    def check(self):
-        pass
-
-    def call(self):
-        pass
-
-    def fold(self):
-        pass
 
     def change_seat(self):
         pass
