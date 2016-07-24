@@ -20,8 +20,13 @@ class RegisterView(TemplateView):
         if is_valid is False:
             return render(request, self.template_name, {'register_form': form})
         else:
+            name = form.cleaned_data.get('user_name')
+            password = form.cleaned_data.get('password')
+            user = User.objects.create_user(username=name, password=password)
+            user.save()
+
+            return redirect('/accounts/login')
             # redirect logic
-            pass
 
     def get(self, request, *args, **kargs):
         return render(request, self.template_name, { 'register_form': self.register_form })
