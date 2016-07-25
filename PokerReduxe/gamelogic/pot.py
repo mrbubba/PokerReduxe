@@ -11,9 +11,8 @@ class Pot(object):
                     not currently in player.stack)
         init_increment(int):  bet increment at the start of each betting round
         increment(int):  current bet increment for this round of betting
-        bet(int):  the current bet
         seats(list):  list of seats currently in the pot not all in
-        all_in(list):  list of seats in the current pot that are all in
+        bet(int):  the current bet
         utg(int):  position that is first to act preflop
         first(int):  position of first to act after the flop
         table(obj):  the table object
@@ -21,8 +20,14 @@ class Pot(object):
 
     methods:
 
-        betting_round:  the main method of pot.  Will be called by dealer to
-                        let pot know its time for a round of betting.
+        betting_round:  if there is only one player in the hand adds pot.pot
+                        to that player.stack, unless there are multiple pots (indicating 1 or more all in players) in which case the
+                        remaining community cards are dealt and analyzer is
+                        called. otherwise sets the appropriate players action
+                        attribute to true to drive the action. betting will be
+                        called by dealer to let pot know its time for a round
+                        of betting.
+
         new_pot:  creates a new pot if a player is all in for less then the
                     current bet(if two or more players are in for the higher amount)
 
@@ -39,6 +44,7 @@ class Pot(object):
         self.table = table
 
     def _new_pot(self):
+        # TODO: spawn new pot in case of all in action
         pass
 
     def betting_round(self):
@@ -51,7 +57,17 @@ class Pot(object):
         # If so increment to the next active player
         for seat in self.seats:
             # Do we have more than one person left in the hand?
-            if len(self.seats) == 1:
+            # if only 1 person left in action, and only 1 pot; award winner
+            # and initiate new hand
+            if len(self.seats) == 1 and len(self.table.pots) == 1:
+                self.seats[0].player.stack += self.pot
+                return self.table.init_hand()
+            # if only 1 active person left in hand, and multiple pots,
+            # we must have all in players
+            elif len(self.seats) == 1:
+                # deal remaining cards
+                while len(self.table.community_cards) < 5:
+                    self.table.dealer.deal()
                 return Analyzer(self.table)
             # this loop will only happen if already in a betting round
             if seat.player.action:
@@ -77,4 +93,3 @@ class Pot(object):
         # if community cards then first is first to act.
         else:
             self.seats[self.first].player.action = True
-

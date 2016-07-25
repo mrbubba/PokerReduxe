@@ -9,8 +9,10 @@ class Seat(object):
         name(str): name of seat (ie seat 1, seat 2, etc)
         active(boolean):  is this seat currently in the game?
         player(obj):  player  currently occupying seat
+        table(obj): the table assoctiated with the seat
     """
-    def __init__(self, name):
+    def __init__(self, name, table):
         name = name
         active = False
         player = None
+        table = None

@@ -12,7 +12,6 @@ class Table(object):
 
         community_cards(list):  a list of the cards shared by all players
         seats(list):  list of seats in the game
-        seats_active(int):  number of active seats
         small_blind_amount(int):  how much the small blind costs
         big_blind_amount(int):  how much the big blind costs
         ante(int):  how much the ante costs
@@ -24,27 +23,29 @@ class Table(object):
         under_the_gun(int):  first player to act pre-flop
         pots(list):  a list of all current pots
         dealer(obj):  the dealer object
-        bought_button(int):   will be the int of the seat that bought the button,
-                            that seat will pay the big and little blinds, the
-                            blinds won't move for the following hand, and the
-                            small blind will be utg.
+        bought_button(int): will be the int of the seat that bought the
+                            button, that seat will pay the big and little
+                            blinds, the blinds won't move for the following
+                            hand, and the small blind will be utg.
         first(int):  tells the pot who is first to act post flop.
 
     Methods:
 
-         init_hand: moves button to the next player.  Increments the
-                    small_blind and big_blind attributes appropriately.  Resets
-                    community_cards and pots to [].  Sets all player.hole
-                    attributes []. Creates the initial pot object, deducts the
-                    blinds and antes and adds them to the pot.pot. Pot inherits
-                    the active seats, and button attributes as well as the
-                    big_blind_amount as the initial pot.bet_increment value.
+         init_hand: if its first hand, init_hand randomly assigns button,
+                    otherwise, moves button to the next player.  Increments
+                    the small_blind and big_blind attributes appropriately.
+                    Resets community_cards and pots to [].  Sets all
+                    player.hole attributes [].
+                    Creates the initial pot object, deducts the
+                    blinds and antes and adds them to the pot.pot. Pot
+                    inherits the active seats, and button attributes as well
+                    as the big_blind_amount as the initial pot.bet_increment
+                    value.
     """
 
     def __init__(self, seats, small_blind_amount, big_blind_amount, ante=0):
         self.community_cards = []
         self.seats = seats
-        # redundant self.seats_active = None
         self.small_blind_amount = small_blind_amount
         self.big_blind_amount = big_blind_amount
         self.ante = ante
@@ -430,6 +431,7 @@ class Table(object):
 
         pot = Pot(pot, self.big_blind_amount, self.big_blind_amount, seats,
                   self.big_blind_amount, self.under_the_gun, self.first, self)
+
         self.pots.append(pot)
 
     def _reset_players(self):

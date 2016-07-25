@@ -13,13 +13,11 @@ class Dealer(object):
 
     Methods:
 
-        new_hand:   removes any player objects from table.seats where
-                    player.stack = 0. calls table.init_hand. deals each player
-                    in table.players two cards to their player.hole attribute.
-                    Then calls pot
+        deal_hole: resets all seat.player.action attributes to false. deals hole
+                cards to all active players. then calls pot.betting_round() to
+                start the action
 
-        deal:   if there is only one player in the hand adds pot.pot to that
-                player.stack. If there is more than one player in the hand and
+        deal:   If there is more than one player in the hand and
                 less then 5 cards in table.community_cards deals the appropriate
                 number of cards. If more then 1 player is in the hand is not all
                 in it calls pot.betting_round, else if table.community_cards<5,
@@ -40,7 +38,7 @@ class Dealer(object):
         return active_players
 
     def _reset_players_action(self):
-        """before we deal any betting round we have to reset the players .active 
+        """before we deal any betting round we have to reset the players .active
         to False"""
         for seat in self.table.seats:
             # can't find this attribute on the player object seat.player.acted = False

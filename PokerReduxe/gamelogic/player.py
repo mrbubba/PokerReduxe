@@ -10,6 +10,7 @@ class Player(Object):
         hole(list):  a list that holds the two private cards for the player
         equity(int):  how much the current player has put in the current round
                       of betting
+        action(bool): set by the pot to indicate players turn to act
         table(obj);  the table object
         missed_big_blind(bool): true if the player was inactive for the last
                                 big blind
@@ -17,20 +18,18 @@ class Player(Object):
                                   small blind
         frozen(bool):  true if player is active, owes blind/s and is ineligible
                        to play this hand(Player will be inactive for the hand.)
-        hot_seat(bool): indicates that action is on the player
-
         hand(str): the final poker hand as set by Analyzer
 
 
     Methods:
 
-        fold:   Removes player from all open pots(ends action for this hand),
-                and sets self.action to false
-        check:  Only available if pot.current_bet is 0, passes tells table to
-                pass action, and sets self.action to false
-        call:   transfers money from self.stack to the current pot = to the
-                current_bet and sets self.action to false
-        bet:    transfers money from self.stack to the current pot.  Must be
+        bet:        a players only action, where a bet is an int of
+                    -1 is a fold, 0 is check,
+                    and 1+ is a bet, appropriate betting logic will be applied on
+                    front end client.
+
+
+                transfers money from self.stack to the current pot.  Must be
                 >= pot.current_bet + pot.bet_increment.  Unless the player is
                 all in for a lesser amount and sets self.action to false
         play:  Toggle seat.active to True or False
@@ -45,7 +44,6 @@ class Player(Object):
         self.hole = []
         self.equity = int()
         self.action = False
-        self.table = None
         self.missed_big_blind = False
         self.missed_small_blind = False
         self.frozen = False
@@ -65,8 +63,4 @@ class Player(Object):
         if self.action:
             self.stack -= amount
             self.equity += amount
-            self.table.pots[-1].pot += amount
-
-
-    def change_seat(self):
-        pass
+            self.seat.table.pots[-1].pot += amount
