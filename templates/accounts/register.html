@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Register</title>
     <form method="post" action="/accounts/register/">
 
         {% csrf_token %}
         {{ register_form }}
-        <input type="submit" value="submit" />
+        <input type="submit" id="register_button" value="submit" />
 
     </form>
 </head>

@@ -51,7 +51,6 @@ class Player(Object):
         self.frozen = False
         self.seat = None
         self.hand = []
-        self.handunit = HandUnit()
 
     # Allows player to sit in or out of a hand.  If player is in a hand they fold
     # They will rejoin on the next hand

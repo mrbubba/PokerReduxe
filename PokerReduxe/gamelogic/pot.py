@@ -53,6 +53,7 @@ class Pot(object):
             # Do we have more than one person left in the hand?
             if len(self.seats) == 1:
                 return Analyzer(self.table)
+            # this loop will only happen if already in a betting round
             if seat.player.action:
                 seat.player.action = False
                 i = self.seats.index(seat)
@@ -69,6 +70,7 @@ class Pot(object):
                 elif self.bet > self.init_increment and self.bet == self.seats[i].player.equity:
                     self.table.dealer.deal()
                     return
+        # Everything below will happen only for the first player in a betting round
         # if no community cards have been dealt utg is first to act
         if not self.table.community_cards:
             self.seats[self.utg].player.action = True
