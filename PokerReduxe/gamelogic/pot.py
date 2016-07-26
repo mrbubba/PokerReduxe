@@ -80,7 +80,7 @@ class Pot(object):
         """
 
         # do we have any all in players in self.seats?
-        action_seats = [x for x in self.seats if x.active and x.player.stack > 0]
+        action_seats = [x for x in self.seats if x.active and x.player.stack > 0 and not x.player.fold]
 
         # are we in the middle of an active round of betting?
         # If so increment to the next active player
@@ -111,7 +111,6 @@ class Pot(object):
                 if seat.player.all_in:
                     # if player's all in create side pot
                     self.side_pots.append(seat.player.equity)
-
                 seat.player.action = False
                 action = False
                 # if next players are not all in set action to true
@@ -120,7 +119,7 @@ class Pot(object):
                     i += 1
                     if i == len(self.seats):
                         i = 0
-                    if not self.seats[i].player.all_in:
+                    if not self.seats[i].player.all_in or not self.seats[i].player.fold:
                         self.seats[i].player.action = True
                         action = True
                 # logic that ends the betting round
@@ -135,6 +134,10 @@ class Pot(object):
                     else:
                         for seat in self.seats:
                             self.pot += seat.player.equity
+                    for player in self.players:
+                        if player.fold:
+                            for pot in self.table.pots:
+                                pot.players.remove(pot.players.index(player))
                     return self.table.dealer.deal()
                 # ends betting round when comes back around to original bettor
                 elif self.bet > self.init_increment or self.table.community_cards:
@@ -144,6 +147,10 @@ class Pot(object):
                         else:
                             for seat in self.seats:
                                 self.pot += seat.player.equity
+                        for player in self.players:
+                            if player.fold:
+                                for pot in self.table.pots:
+                                    pot.players.remove(pot.players.index(player))
                         return self.table.dealer.deal()
                 return
         # Everything below will happen only for the first player in a betting round

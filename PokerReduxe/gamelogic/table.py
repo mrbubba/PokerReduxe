@@ -443,6 +443,7 @@ class Table(object):
                 seat.active = True
                 seat.player.frozen = False
             if seat.player is not None:
+                seat.player.fold = False
                 seat.player.hole = []
                 seat.player.hand = []
                 seat.player.equity = 0

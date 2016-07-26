@@ -48,6 +48,7 @@ class Player(Object):
         self.seat = None
         self.hand = []
         self.all_in = False
+        self.fold = False
 
     # Allows player to sit in or out of a hand.  If player is in a hand they fold
     # They will rejoin on the next hand
@@ -66,4 +67,8 @@ class Player(Object):
             self.equity += amount
             if self.stack == 0:
                 self.all_in = True
-            self.seat.table.pots[-1].betting_round()
+            return self.seat.table.pots[-1].betting_round()
+
+    def fold(self):
+        self.fold = True
+        return self.seat.table.pots[-1].betting_round()
