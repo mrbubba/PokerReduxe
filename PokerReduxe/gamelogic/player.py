@@ -59,8 +59,11 @@ class Player(Object):
             self.frozen = True
 
     def bet(self, amount):
-        if self.action:
+        if not self.action:
+            pass
+        else:
             self.stack -= amount
             self.equity += amount
             if self.stack == 0:
                 self.all_in = True
+            self.seat.table.pots[-1].betting_round()

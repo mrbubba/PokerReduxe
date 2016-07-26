@@ -47,12 +47,30 @@ class Pot(object):
         self.table = table
 
     def _new_pots(self):
-        # spawn new pot in case of all in action
+        # spawn new pot/s in case of all in action/s
+        # sort pots from smallest to largest
+        sorted_pots = sorted(self.side_pots, key=int)
+        while sorted_pots:
+            # get smallest pot
+            _pot_eq = sorted_pots.pop(0)
+            # get players in pot
+            _seats = [x for x in self.seats if x.player.equity > 0]
+            # get proper value of pot
+            _pot = _pot_eq * len(_seats)
+            # instantiate new pot
+            _new_pot = Pot(_pot, self.init_increment, self.increment,
+                    _seats, self.bet, self.utg, self.first, self.table)
+            # save pot to pots
+            self.table.pots.append(_new_pot)
+            # we need to remove the _pot_eq from each players equity
+            for seat in _seats:
+                seat.player.equity -= _pot_eq
+            # we need to remove the current _pot_eq from remaining pots
+            i = 0
+            while i < len(self.side_pots):
+                self.side_pots[i] -= _pot_eq
+                i += 1
 
-        pot = Pot(new_pot, self.init_increment, self.increment,
-                self.seats, self.bet, self.utg, self.first, self.table)
-
-        self.table.pots.append(pot)
 
     def betting_round(self):
         """we need a round of betting.  Must appropriately tell players to act,
@@ -87,9 +105,16 @@ class Pot(object):
                     self.table.dealer.deal()
                 return Analyzer(self.table)
             # this loop will only happen if already in a betting round
+        for seat in self.seats:
             if seat.player.action:
+                # check to see if player is all in
+                if seat.player.all_in:
+                    # if player's all in create side pot
+                    self.side_pots.append(seat.player.equity)
+
                 seat.player.action = False
                 action = False
+                # if next players are not all in set action to true
                 while not action:
                     i = self.seats.index(seat)
                     i += 1
@@ -98,16 +123,29 @@ class Pot(object):
                     if not self.seats[i].player.all_in:
                         self.seats[i].player.action = True
                         action = True
-
+                # logic that ends the betting round
+                # if bet returns to first pos, deal
                 if self.bet == 0 and i == self.first:
-                    self.table.dealer.deal()
-                    return
+                    return self.table.dealer.deal()
+                # if the seat in question is utg and the bet is big blind and
+                # is pre flop, end betting round
                 elif i == self.utg and self.bet == self.init_increment and len(self.table.community_cards) == 0:
-                    self.table.dealer.deal()
-                    return
-                elif self.bet > self.init_increment and self.bet == self.seats[i].player.equity:
-                    self.table.dealer.deal()
-                    return
+                    if self.side_pots:
+                        self._new_pots()
+                    else:
+                        for seat in self.seats:
+                            self.pot += seat.player.equity
+                    return self.table.dealer.deal()
+                # ends betting round when comes back around to original bettor
+                elif self.bet > self.init_increment or self.table.community_cards:
+                    if self.bet == self.seats[i].player.equity and self.bet > 0:
+                        if self.side_pots:
+                            self._new_pots()
+                        else:
+                            for seat in self.seats:
+                                self.pot += seat.player.equity
+                        return self.table.dealer.deal()
+                return
         # Everything below will happen only for the first player in a betting round
         # if no community cards have been dealt utg is first to act
         if not self.table.community_cards:
