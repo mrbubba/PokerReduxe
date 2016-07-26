@@ -19,6 +19,7 @@ class Player(Object):
         frozen(bool):  true if player is active, owes blind/s and is ineligible
                        to play this hand(Player will be inactive for the hand.)
         hand(str): the final poker hand as set by Analyzer
+        all_in(bool):
 
 
     Methods:
@@ -27,14 +28,11 @@ class Player(Object):
                     -1 is a fold, 0 is check,
                     and 1+ is a bet, appropriate betting logic will be applied on
                     front end client.
+                    deducts from player.stack .  Must be == pot.current_bet or
+                    >= pot.current_bet + pot.bet_increment.  Unless the player is
+                    all in for a lesser amount
 
-
-                transfers money from self.stack to the current pot.  Must be
-                >= pot.current_bet + pot.bet_increment.  Unless the player is
-                all in for a lesser amount and sets self.action to false
-        play:  Toggle seat.active to True or False
-        change_seat:  Change to another available seat
-        act(bool):  sets hot_seat, and allows player to act.
+        play:       Toggle seat.active to True or False
 
     """
 
@@ -49,6 +47,7 @@ class Player(Object):
         self.frozen = False
         self.seat = None
         self.hand = []
+        self.all_in = False
 
     # Allows player to sit in or out of a hand.  If player is in a hand they fold
     # They will rejoin on the next hand
@@ -63,4 +62,5 @@ class Player(Object):
         if self.action:
             self.stack -= amount
             self.equity += amount
-            self.seat.table.pots[-1].pot += amount
+            if self.stack == 0:
+                self.all_in = True

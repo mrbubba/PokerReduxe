@@ -9,6 +9,8 @@ class Pot(object):
 
         pot(int):   total amount of chips in the middle(another words all chips
                     not currently in player.stack)
+        side_pots(list):   list of side pot equity ints. used to spawn new pots
+                          in the case of all in player/s
         init_increment(int):  bet increment at the start of each betting round
         increment(int):  current bet increment for this round of betting
         seats(list):  list of seats currently in the pot not all in
@@ -35,6 +37,7 @@ class Pot(object):
 
     def __init__(self, pot, init_increment, increment, seats, bet, utg, first, table):
         self.pot = pot
+        self.side_pots = []
         self.init_increment = init_increment
         self.increment = increment
         self.seats = seats
@@ -43,9 +46,13 @@ class Pot(object):
         self.first = first
         self.table = table
 
-    def _new_pot(self):
-        # TODO: spawn new pot in case of all in action
-        pass
+    def _new_pots(self):
+        # spawn new pot in case of all in action
+
+        pot = Pot(new_pot, self.init_increment, self.increment,
+                self.seats, self.bet, self.utg, self.first, self.table)
+
+        self.table.pots.append(pot)
 
     def betting_round(self):
         """we need a round of betting.  Must appropriately tell players to act,
@@ -53,18 +60,28 @@ class Pot(object):
         award the pot to the remaining player and notify the table to start a
         new hand.
         """
+
+        # do we have any all in players in self.seats?
+        action_seats = [x for x in self.seats if x.active and x.player.stack > 0]
+
         # are we in the middle of an active round of betting?
         # If so increment to the next active player
-        for seat in self.seats:
+        for seat in action_seats:
+
             # Do we have more than one person left in the hand?
             # if only 1 person left in action, and only 1 pot; award winner
             # and initiate new hand
-            if len(self.seats) == 1 and len(self.table.pots) == 1:
-                self.seats[0].player.stack += self.pot
+            if len(action_seats) == 1 and len(self.table.pots) == 1 and not self.side_pots:
+                for seat in self.seats:
+                    self.pot += seat.player.equity
+                action_seats[0].player.stack += self.pot
                 return self.table.init_hand()
             # if only 1 active person left in hand, and multiple pots,
             # we must have all in players
-            elif len(self.seats) == 1:
+            elif len(action_seats) == 1:
+                if self.side_pots:
+                    self._new_pots()
+
                 # deal remaining cards
                 while len(self.table.community_cards) < 5:
                     self.table.dealer.deal()
@@ -72,15 +89,20 @@ class Pot(object):
             # this loop will only happen if already in a betting round
             if seat.player.action:
                 seat.player.action = False
-                i = self.seats.index(seat)
-                i += 1
-                if i == len(self.seats):
-                    i = 0
-                self.seats[i].player.action = True
+                action = False
+                while not action:
+                    i = self.seats.index(seat)
+                    i += 1
+                    if i == len(self.seats):
+                        i = 0
+                    if not self.seats[i].player.all_in:
+                        self.seats[i].player.action = True
+                        action = True
+
                 if self.bet == 0 and i == self.first:
                     self.table.dealer.deal()
                     return
-                elif i == self.utg and self.bet == self.init_increment:
+                elif i == self.utg and self.bet == self.init_increment and len(self.table.community_cards) == 0:
                     self.table.dealer.deal()
                     return
                 elif self.bet > self.init_increment and self.bet == self.seats[i].player.equity:
