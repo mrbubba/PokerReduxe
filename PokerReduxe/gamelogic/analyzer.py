@@ -6,17 +6,17 @@ class Analyzer(object):
     Attributes:
 
        table(obj):  table object
-       poker_hands(lst): refers old_poker hands to numbers eg Pair will = 1
+       poker_hands(lst): refers poker hands to numbers eg Pair will = 1
 
-    We will represent the old_poker hands thusly:
+    We will represent the poker hands thusly:
         straight flush: [8, 14] for highest possible and [8,5] for lowest possible
         4 of Kind: ( four 10's w/ ace kicker ) : [ 7,10,14]
         full house: ( queens full of 9's ) : [ 6,12,9]
         flush : ( flush with king, jack, 9, 6 and a 4 ) : [ 5, 13,11,9,6,4 ]
         straight: (nine high): [ 4,9]
         three of a kind: ( three 6's an Ace and a King ) : [ 3,6,14,13]
-        two pair: ( 8'ss and 4's and an ace ) : [ 2,8,4,14]
-        pair: ( two 9's, and ace, 10 and a 7 )  : [ 1,14,10,7]
+        two pair: ( 8's and 4's and an ace ) : [ 2,8,4,14]
+        pair: ( two 9's, and ace, 10 and a 7 )  : [ 1,9,14,10,7]
         high card : ( jack, ten, nine, eight, five ) : [ 0,11,10,9,8,5]
 
     Methods:
@@ -30,7 +30,7 @@ class Analyzer(object):
     def __init__(self, table):
         self.table = table
         # self.pot = self.table.pots.pop()
-        self.pot = self.table.pots[len(self.table.pots)-1]
+        self.pot = []
 
     def _award(self, players):
         """awards the pot to the winner(s)"""
@@ -185,16 +185,7 @@ class Analyzer(object):
 
     def _setup(self):
         """get the players in the pot and their hands"""
-        players = []
-        """get all active players and append them to players  """
-
-        for seat in self.pot.seats:
-            if seat.active:
-                players.append(seat.player)
-
-        """ append all all in players to players list"""
-        for seat in self.pot.all_in:
-            players.append(seat.player)
+        players = self.pot.players
 
         for player in players:
             player.hole += self.table.community_cards
@@ -202,9 +193,11 @@ class Analyzer(object):
         return players
 
     def analyze(self):
-        players = self._setup()
-        self._order(players)
-        self._flush(players)
-        self._matching(players)
-        self._compare(players)
-        self._award(players)
+        while self.table.pots:
+            self.pot = self.table.pots.pop()
+            players = self._setup()
+            self._order(players)
+            self._flush(players)
+            self._matching(players)
+            self._compare(players)
+            self._award(players)
