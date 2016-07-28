@@ -29,8 +29,9 @@ class Analyzer(object):
 
     def __init__(self, table):
         self.table = table
+        self.seats = self.table.seats
         # self.pot = self.table.pots.pop()
-        self.pot = []
+        self.pot = None
 
     def _award(self, players):
         """awards the pot to the winner(s)"""
@@ -185,7 +186,9 @@ class Analyzer(object):
 
     def _setup(self):
         """get the players in the pot and their hands"""
-        players = self.pot.players
+        for seat in self.pot.seats:
+            if seat.active:
+                players.append(seat.player)
 
         for player in players:
             player.hole += self.table.community_cards

@@ -1,8 +1,8 @@
 import random
 
 
-from .pot import Pot
-from .dealer import Dealer
+from pot import Pot
+from dealer import Dealer
 
 
 class Table(object):
@@ -307,7 +307,8 @@ class Table(object):
 
     def _create_pot(self):
         """creates the initial pot object with the blinds and antes"""
-
+        # import pdb
+        # pdb.set_trace()
         bb = self.seats[self.big_blind]
         sb = self.seats[self.small_blind]
         # as per conversation with Jared this is unneeded all_in = []
@@ -323,11 +324,9 @@ class Table(object):
             if buyer.player.stack > self.small_blind_amount + self.big_blind_amount:
                 buyer.player.equity = self.big_blind
                 buyer.player.stack -= self.small_blind_amount + self.big_blind_amount
-                pot += self.small_blind_amount + self.big_blind_amount
 
             elif buyer.player.stack >= self.big_blind_amount:
                 buyer.player.equity = self.big_blind
-                pot += buyer.player.stack
                 buyer.player.stack = 0
         else:
             if sb.active:
@@ -337,44 +336,37 @@ class Table(object):
 
                     if sb.player.stack > self.small_blind_amount + self.big_blind_amount:
                         sb.player.stack -= self.small_blind_amount + self.big_blind_amount
-                        pot += self.small_blind_amount + self.big_blind_amount
                         sb.player.equity = self.big_blind_amount
                         sb.player.missed_big_blind = False
 
                     elif sb.player.stack > self.big_blind_amount:
-                        pot += sb.player.stack
                         sb.player.stack = 0
                         sb.player.equity = self.big_blind_amount
                         sb.player.missed_big_blind = False
 
                     else:
-                        pot += sb.player.stack
                         sb.player.equity = sb.player.stack
                         sb.player.stack = 0
                         sb.player.missed_big_blind = False
 
                 elif sb.player.stack > self.small_blind_amount:
                     sb.player.stack -= self.small_blind_amount
-                    pot += self.small_blind_amount
                     sb.player.equity = self.small_blind_amount
 
                 # if small blind puts player all in put player in all_in list
                 else:
-                    pot += sb.player.stack
                     sb.player.equity = sb.player.stack
                     sb.player.stack = 0
 
             # add the big blind to the pot
             if bb.player.stack > self.big_blind_amount:
                 bb.player.stack -= self.big_blind_amount
-                pot += self.big_blind_amount
                 bb.player.equity = self.big_blind_amount
                 bb.player.missed_big_blind = False
                 bb.player.missed_small_blind = False
 
             # if big blind puts player all in put player in all_in list
             elif bb.player.stack <= self.big_blind_amount:
-                pot += bb.player.stack
                 bb.player.equity = bb.player.stack
                 bb.player.stack = 0
                 bb.player.missed_big_blind = False
@@ -387,12 +379,10 @@ class Table(object):
                     seat.player.missed_big_blind = False
                     seat.player.stack -= self.big_blind_amount
                     seat.player.equity = self.big_blind_amount
-                    pot += self.big_blind_amount
                 else:
                     # if bb puts player all in set equity accordingly
                     # and set missed blinds to False
                     seat.player.equity = seat.player.stack
-                    pot += seat.player.stack
                     seat.player.stack = 0
                     seat.active = False
                     seat.player.missed_small_blind = False
@@ -403,7 +393,6 @@ class Table(object):
                 if seat.player.stack > self.small_blind_amount:
                     seat.player.missed_small_blind = False
                     seat.player.stack -= self.small_blind_amount
-                    pot += self.small_blind_amount
                     # pre-deal equity cannot exceed bb amount
                     if seat.player.equity == 0:
                         seat.player.equity = self.small_blind_amount
@@ -412,7 +401,6 @@ class Table(object):
                     # and set missed sb to False
                     if seat.player.equity == 0:
                         seat.player.equity = seat.player.stack
-                    pot += seat.player.stack
                     seat.player.stack = 0
                     seat.player.missed_small_blind = False
 
@@ -421,9 +409,7 @@ class Table(object):
             for seat in active_seats:
                 if seat.player.stack >= self.ante:
                     seat.player.stack -= self.ante
-                    pot += self.ante
                 else:
-                    pot += seat.player.stack
                     seat.player.stack = 0
 
         # (pot, init_increment, increment, seats, bet, utg, first, table)
@@ -433,6 +419,7 @@ class Table(object):
                   self.big_blind_amount, self.under_the_gun, self.first, self)
 
         self.pots.append(pot)
+        return self.pots
 
     def _reset_players(self):
         # set player attributes for start of new hand

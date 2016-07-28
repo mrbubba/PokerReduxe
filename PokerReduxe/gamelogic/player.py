@@ -1,7 +1,6 @@
-from madehand import HandUnit
 
 
-class Player(Object):
+class Player(object):
     """The player object
     Attributes:
 

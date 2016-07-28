@@ -6,6 +6,7 @@ from player import Player
 from table import Table
 from dealer import Dealer
 from seat import Seat
+from pot import Pot
 
 
 class TestDeck(unittest.TestCase):
@@ -54,13 +55,16 @@ class TestDealer(unittest.TestCase):
             seat.player = players[player]
             seat.player.seat = seat
             seat.active = True
-            seat.player.table = self.table
+            seat.table = self.table
             player += 1
+
+        pot = Pot(2, 2, 2, seats, 0, 0, 2, self.table)
+        self.table.pots.append(pot)
 
     def test_deal_hole(self):
         """can the dealer deal two cards to each player??"""
         self.table.seats[2].active = False
-        self.table.init_hand()
+        self.dealer.deal_hole()
         # only want the active players
         players = []
         for seat in self.table.seats:
@@ -71,6 +75,12 @@ class TestDealer(unittest.TestCase):
             self.assertEqual(len(player.hole), 2)
         # inactive players shouldn't have cards
         self.assertEqual(len(self.table.seats[2].player.hole), 0)
+
+    def test_deal(self):
+        self.table.community_cards = []
+        self.dealer.deal_hole()
+        self.dealer.deal()
+        self.assertTrue(self.table.community_cards)
 
 if __name__ == '__main__':
     unittest.main()

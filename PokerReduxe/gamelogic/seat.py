@@ -1,7 +1,7 @@
 __author__ = 'mark'
 
 
-class Seat(object):
+class Seat():
     """  Seat object up to nine max
 
     Attributes:
@@ -11,7 +11,7 @@ class Seat(object):
         player(obj):  player  currently occupying seat
         table(obj): the table assoctiated with the seat
     """
-    def __init__(self, name, table):
+    def __init__(self, name):
         name = name
         active = False
         player = None

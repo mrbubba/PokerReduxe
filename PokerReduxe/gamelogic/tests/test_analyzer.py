@@ -1,10 +1,12 @@
 __author__ = 'mark'
 import unittest
-from .player import Player
-from .table import Table
-from .dealer import Dealer
-from .seat import Seat
-from .analyzer import Analyzer
+
+
+from player import Player
+from table import Table
+from dealer import Dealer
+from seat import Seat
+from analyzer import Analyzer
 
 
 class TestAnalyzer(unittest.TestCase):
@@ -24,7 +26,7 @@ class TestAnalyzer(unittest.TestCase):
         self.s4 = Seat('s4')
         self.s5 = Seat('s5')
 
-        players = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5]
+        self.players = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5]
         seats = [self.s0, self.s1, self.s2, self.s3, self.s4, self.s5]
 
         self.table = Table(seats, 5, 10, 0)
@@ -33,10 +35,10 @@ class TestAnalyzer(unittest.TestCase):
 
         player = 0
         for seat in seats:
-            seat.player = players[player]
+            seat.player = self.players[player]
             seat.player.seat = seat
             seat.active = True
-            seat.player.table = self.table
+            seat.table = self.table
             player += 1
 
         self.table.init_hand()
@@ -80,7 +82,6 @@ class TestAnalyzer(unittest.TestCase):
 
     def test_compare(self):
         """can we determine the winning hand"""
-        players = self.analyzer._setup()
 
         self.p0.hand = [0, 14, 12, 11, 10, 8]
         self.p1.hand = [1, 14, 12, 11, 8]
@@ -89,14 +90,13 @@ class TestAnalyzer(unittest.TestCase):
         self.p4.hand = [0]
         self.p5.hand = [0]
 
-        result = self.analyzer._compare(players)
+        result = self.analyzer._compare(self.players)
         expected = [self.p3]
         self.assertEqual(expected, result)
 
     def test_compare_multiple(self):
         """if there are multiple winners do we
         return all of them?"""
-        players = self.analyzer._setup()
 
         self.p0.hand = [0, 14, 12, 11, 10, 8]
         self.p1.hand = [1, 14, 12, 11, 8]
@@ -105,13 +105,12 @@ class TestAnalyzer(unittest.TestCase):
         self.p4.hand = [0]
         self.p5.hand = [0]
 
-        result = self.analyzer._compare(players)
+        result = self.analyzer._compare(self.players)
         expected = [self.p2, self.p3]
         self.assertEqual(expected, result)
 
     def test_hi_card(self):
         """can we identify a hi card hand?"""
-        players = self.analyzer._setup()
 
         self.p4.hole[0].value = 12
         self.p4.hole[1].value = 11
@@ -121,7 +120,7 @@ class TestAnalyzer(unittest.TestCase):
         self.p4.hole[5].value = 3
         self.p4.hole[6].value = 2
 
-        players = self.analyzer._order(players)
+        players = self.analyzer._order(self.players)
 
         self.analyzer._matching(players)
 
@@ -131,7 +130,6 @@ class TestAnalyzer(unittest.TestCase):
     def test_matching_hands(self):
         """can we find matching number hands
          eg.  pairs through quads??"""
-        players = self.analyzer._setup()
 
         # quads
         self.p0.hole[0].value = 14
@@ -159,7 +157,7 @@ class TestAnalyzer(unittest.TestCase):
         self.p4.hole[5].value = 3
         self.p4.hole[6].value = 2
 
-        players = self.analyzer._order(players)
+        players = self.analyzer._order(self.players)
 
         self.analyzer._matching(players)
 
@@ -176,7 +174,7 @@ class TestAnalyzer(unittest.TestCase):
 
     def test_straight(self ):
         """can we find the highest straight in a hand"""
-        players = self.analyzer._setup()
+
         #p0 has a 6 high straight
         self.p0.hole[0].value = 8
         self.p0.hole[1].value = 6
@@ -187,9 +185,14 @@ class TestAnalyzer(unittest.TestCase):
         self.p0.hole[6].value = 2
         #poor p1 hit the wheel
         self.p1.hole[0].value = 14
-        self.p1.hole[1].value = 11
+        self.p1.hole[1].value = 5
+        self.p1.hole[2].value = 4
+        self.p1.hole[3].value = 3
+        self.p1.hole[4].value = 2
+        self.p1.hole[5].value = 11
+        self.p1.hole[6].value = 10
 
-        self.analyzer._order(players)
+        self.analyzer._order(self.players)
 
         self.analyzer._straight(self.p0)
         self.analyzer._straight(self.p1)
@@ -200,7 +203,6 @@ class TestAnalyzer(unittest.TestCase):
 
     def test_flush(self):
         """Can we find a flush in the players' hands"""
-        players = self.analyzer._setup()
         # a flush
         self.p0.hole[0].suit = "d"
         self.p0.hole[0].value = 2
@@ -221,7 +223,8 @@ class TestAnalyzer(unittest.TestCase):
         self.p1.hole[2].value = 12
         self.p1.hole[3].value = 11
         self.p1.hole[4].value = 10
-        players = self.analyzer._order(players)
+
+        players = self.analyzer._order(self.players)
 
         self.analyzer._flush(players)
         self.assertTrue(self.p0.hand)
@@ -233,9 +236,8 @@ class TestAnalyzer(unittest.TestCase):
 
     def test_order(self):
         """Can we order the hands in a proper order, left to right"""
-        players = self.analyzer._setup()
 
-        players = self.analyzer._order(players)
+        players = self.analyzer._order(self.players)
         for player in players:
             for i in range(6):
                 v1 = player.hole[i].value
@@ -244,7 +246,7 @@ class TestAnalyzer(unittest.TestCase):
 
     def test_seven_cards(self):
         """Can we get a list of players in the hand with 7 cards in the hand"""
-        players = self.analyzer._setup()
+
         for player in players:
             self.assertTrue(len(player.hole) == 7)
 
