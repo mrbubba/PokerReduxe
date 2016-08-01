@@ -77,63 +77,38 @@ class Table(object):
                 self.big_blind = 0
             else:
                 self.big_blind = self.button + 1
+        elif len(active_seats_index) == 2:
+            self.small_blind = self.button
+            # checking to see if any non active players missed the big blind
+            self.big_blind = self.small_blind + 1
+            i = self.big_blind
+            while i != self.button:
+                if i == 0:
+                    i = len(self.seats)
+                i -= 1
+                if i != self.big_blind:
+                    self.seats[i].player.missed_big_blind = True
+
         else:
             self.small_blind = self.button + 1
-            seats_button = self.seats[active_seats_index[self.button]]
+            # i is the iterator for the while loop we are using to check for missed small blinds
+            i = self.small_blind
+            while i != self.button:
+                if i == 0:
+                    i = len(self.seats)
+                i -= 1
+                if i != self.button:
+                    self.seats[i].player.missed_small_blind = True
 
-
-        self.small_blind =
-
-        # check to make sure we've assigned the button to an active seat
-        for seat in active_seats:
-            seat.player.missed_big_blind = False
-            seat.player.missed_small_blind = False
-
-        if self.button >= len(active_seats):
-            self.button = 0
-
-        # set the small blind
-        self.small_blind = self.button + 1
-        seats_button = self.seats.index(active_seats[self.button])
-        seats_sb = self.seats.index(active_seats[self.small_blind])
-
-        #must ensure that any inactive players that missed their small blind are flagged appropriately
-
-        #step 1:  first check if the total number of occuppied seats is greater than the total number of active seats
-
-        #         if the two values are equal nobody has missed a blind
-
-
-
-
-
-
-
-
-
-
-
-        move = True
-        while move:
-            if self.small_blind >= len(active_seats):
-                self.small_blind = 0
-            elif self.seats[self.small_blind].player:
-                self.seats[self.small_blind].player.missed_small_blind = True
-            if move:
-                self.small_blind += 1
-
-        # set the big blind
-        self.big_blind = self.small_blind + 1
-        move = True
-        while move:
-            if self.big_blind >= len(self.seats):
-                self.big_blind = 0
-            if self.seats[self.big_blind].active:
-                move = False
-            elif self.seats[self.big_blind].player:
-                self.seats[self.big_blind].player.missed_big_blind = True
-            if move:
-                self.big_blind += 1
+            self.big_blind = self.small_blind + 1
+            # i is the iterator for the while loop we are using to check for missed big blinds
+            i = self.big_blind
+            while i != self.small_blind:
+                if i == 0:
+                    i = len(self.seats)
+                i -= 1
+                if i != self.big_blind:
+                    self.seats[i].player.missed_big_blind = True
 
         # set utg (Under the Gun) for first round of betting (first to act)
         self.under_the_gun = self.big_blind + 1
@@ -441,7 +416,6 @@ class Table(object):
                   self.big_blind_amount, self.under_the_gun, self.first, self)
 
         self.pots.append(pot)
-        # return self.pots
 
     def _reset_players(self):
         # set player attributes for start of new hand
