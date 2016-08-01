@@ -58,8 +58,7 @@ class Pot(object):
             # get proper value of pot
             _pot = _pot_eq * len(_seats)
             # instantiate new pot
-            _new_pot = Pot(_pot, self.init_increment, self.increment,
-                    _seats, self.bet, self.utg, self.first, self.table)
+            _new_pot = Pot(_pot, self.init_increment, self.increment, _seats, self.bet, self.utg, self.first, self.table)
             # save pot to pots
             self.table.pots.append(_new_pot)
             # we need to remove the _pot_eq from each players equity
@@ -70,7 +69,6 @@ class Pot(object):
             while i < len(self.side_pots):
                 self.side_pots[i] -= _pot_eq
                 i += 1
-
 
     def betting_round(self):
         """we need a round of betting.  Must appropriately tell players to act,
@@ -95,7 +93,7 @@ class Pot(object):
                 action_seats[0].player.stack += self.pot
                 return self.table.init_hand()
             # if only 1 active person left in hand, and multiple pots,
-            # we must have all in players
+            # we must have all in player
             elif len(action_seats) == 1:
                 if self.side_pots:
                     self._new_pots()
@@ -156,7 +154,12 @@ class Pot(object):
         # Everything below will happen only for the first player in a betting round
         # if no community cards have been dealt utg is first to act
         if not self.table.community_cards:
-            self.seats[self.utg].player.action = True
+            try:
+                self.seats[self.utg].player.action = True
+            except:
+                import pdb
+                pdb.set_trace()
+
         # if community cards then first is first to act.
         else:
             self.seats[self.first].player.action = True

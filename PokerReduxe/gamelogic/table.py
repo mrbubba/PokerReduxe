@@ -59,42 +59,64 @@ class Table(object):
         self.first = None
 
     def _get_active_seats(self):
-        for seat in self.seats:
-            if seat.active:
-                try:
-                    active_seat.append(seat)
-                except NameError:
-                    active_seat = [seat]
+        active_seat = [x for x in self.seats if x.active]
         return active_seat
 
     def set_button(self):
         """At the start of game we need to randomly assign the button
         and blinds to an active seat."""
-        self.button = random.randint(1, len(self.seats) - 1)
+        active_seats_index = [self.seats.index(x) for x in self.seats if x.active]
+        self.button = random.choice(active_seats_index)
+        if len(active_seats_index) == len(self.seats):
+            # we're done nobody missed the small blind or the big blind
+            if self.button + 1 >= len(self.seats):
+                self.small_blind = 0
+            else:
+                self.small_blind = self.button + 1
+            if self.small_blind + 1 >= len(self.seats):
+                self.big_blind = 0
+            else:
+                self.big_blind = self.button + 1
+        else:
+            self.small_blind = self.button + 1
+            seats_button = self.seats[active_seats_index[self.button]]
+
+
+        self.small_blind =
 
         # check to make sure we've assigned the button to an active seat
-        for seat in self.seats:
-            if seat.player:
-                seat.player.missed_big_blind = False
-                seat.player.missed_small_blind = False
+        for seat in active_seats:
+            seat.player.missed_big_blind = False
+            seat.player.missed_small_blind = False
 
-        move = True
-        while move:
-            if self.button >= len(self.seats):
-                self.button = 0
-            if self.seats[self.button].active:
-                move = False
-            else:
-                self.button += 1
+        if self.button >= len(active_seats):
+            self.button = 0
 
         # set the small blind
         self.small_blind = self.button + 1
+        seats_button = self.seats.index(active_seats[self.button])
+        seats_sb = self.seats.index(active_seats[self.small_blind])
+
+        #must ensure that any inactive players that missed their small blind are flagged appropriately
+
+        #step 1:  first check if the total number of occuppied seats is greater than the total number of active seats
+
+        #         if the two values are equal nobody has missed a blind
+
+
+
+
+
+
+
+
+
+
+
         move = True
         while move:
-            if self.small_blind >= len(self.seats):
+            if self.small_blind >= len(active_seats):
                 self.small_blind = 0
-            if self.seats[self.small_blind].active:
-                move = False
             elif self.seats[self.small_blind].player:
                 self.seats[self.small_blind].player.missed_small_blind = True
             if move:
@@ -419,7 +441,7 @@ class Table(object):
                   self.big_blind_amount, self.under_the_gun, self.first, self)
 
         self.pots.append(pot)
-        return self.pots
+        # return self.pots
 
     def _reset_players(self):
         # set player attributes for start of new hand
