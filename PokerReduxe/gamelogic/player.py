@@ -12,6 +12,7 @@ class Player():
             @property {bool} acted Has player acted in betting round
             @property {bool} action Is action currently on player
             @property {bool} missed_sb Indicates player missed small blind
+            @property {bool} missed_bb Indicates player missed big blind
 
     METHODS:
 

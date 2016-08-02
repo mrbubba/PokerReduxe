@@ -26,6 +26,8 @@ def pushAction(players, pot):
 
     get_active_players = [x for x in table.seats.players]
     betting_order = getBettingOrder(table, get_active_players)
+    check_missed_blinds = table.check_missed_blinds(betting_order)
+    betting_order = getBettingOrder(table, check_missed_blinds)
     button = getButton()
 
 
@@ -42,7 +44,7 @@ def create_side_pot(table, pot):
                 players = pot.players[:]
                 amount = side_pots.pop(0)
 
-        
+
         create_pot(table, players)
 
 def create_pot(table, players):
