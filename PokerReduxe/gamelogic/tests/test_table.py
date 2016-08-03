@@ -19,6 +19,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(len(self.table.seats), 6)
 
     def test_seats_dict_exception(self):
+        """ Do we throw an error when too many seats """
         with self.assertRaises(ValueError):
             Table(12, 1, 2, [50, 10])
 
@@ -30,15 +31,17 @@ class TestTable(unittest.TestCase):
     def test_join_taken_seat(self):
         """Can a player take an already filled spot??  We hope not!!"""
         self.table.seats[1] = self.player1
-        self.table.join(1, self.player2, 100)
+        with self.assertRaises(ValueError):
+            self.table.join(1, self.player2, 100)
         self.assertTrue(self.table.seats[1].name == self.player1.name)
-        #Todo test exception
+
 
     def test_player_can_only_have_one_seat_at_the_table(self):
         """A player should only occupy one seat per table."""
         self.table.join(1, self.player1, 100)
-        self.table.join(2, self.player1, 100)
-        self.assertTrue(self.table.seats[2] == "")
+        with self.assertRaises(ValueError):
+            self.table.join(2, self.player1, 100)
+        self.assertTrue(self.table.seats[2] == None)
 
     def test_player_table_attribute_set(self):
         """can we set player.table to this table?"""
@@ -52,8 +55,17 @@ class TestTable(unittest.TestCase):
 
     def test_set_buyin_range(self):
         """Can we restrict players to the table buyin range?"""
-        self.table.join(1, self.player1, 110)
-        # TODO: exception test
+        with self.assertRaises(ValueError):
+            self.table.join(1, self.player1, 110)
+        self.assertTrue(self.table.seats[1] == None)
+
+    def test_quit(self):
+        """ Can a player quit the game? """
+        self.table.join(1, self.player1, 100)
+        self.table.quit(self.player1)
+        self.assertTrue(self.table.seats[1] == None)
+        self.assertTrue(self.player1.table == None)
+        self.assertEqual(self.player1.stack, 0)
 
 
 if __name__ == '__main__':

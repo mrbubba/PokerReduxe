@@ -4,6 +4,7 @@ Start:
 Create table (sb,bb,ante,num seats etc)
 Set players at seats
 Get sb position(players, lastSmalll, lastBig)  //returns ordered players
+
     Check/Set missed bb and sb
     Edge logic for missed blinds etc...
 
