@@ -36,14 +36,10 @@ class Table():
     # @param seats The num of seats passed in instantiation
     # @return null
     def _build_seats(self, seats):
-            try:
-                if seats in range(2, 10):
-                    x = 1
-                    while x <= seats:
-                        self.seats[x] = ''
-                        x += 1
-            except ValueError:
-                print(" Seats must be between 2 and 9 ")
+        if seats not in range(2, 10):
+            raise ValueError("Tables must have between 2 and 9 players.")
+        for i in range(seats):
+            self.seats[i] = None
 
     # @param key The key of the seat in seats dict.
     # @param player The player object in question

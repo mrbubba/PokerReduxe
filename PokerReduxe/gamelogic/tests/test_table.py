@@ -4,7 +4,6 @@ from table import Table
 from player import Player
 
 
-
 class TestTable(unittest.TestCase):
     """ Do we have a working table object? """
 
@@ -19,10 +18,9 @@ class TestTable(unittest.TestCase):
         """ Is seats dict properly created on instantiation """
         self.assertEqual(len(self.table.seats), 6)
 
-#    def test_seats_dict_exception(self):
-#        response = Table(12, 1, 2)
-
-#        self.asser(" Seats must be between 2 and 9 " in response)
+    def test_seats_dict_exception(self):
+        with self.assertRaises(ValueError):
+            Table(12, 1, 2, [50, 10])
 
     def test_join_table(self):
         """Can a player join our table??"""
@@ -56,7 +54,6 @@ class TestTable(unittest.TestCase):
         """Can we restrict players to the table buyin range?"""
         self.table.join(1, self.player1, 110)
         # TODO: exception test
-
 
 
 if __name__ == '__main__':
