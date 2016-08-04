@@ -5,7 +5,35 @@ Create table (sb,bb,ante,num seats etc)
 Set players at seats
 Get sb position(players, lastSmalll, lastBig)  //returns ordered players
 
-    Check/Set missed bb and sb
+    Set missed bb and sb
+        check if guy in bb last hand is in sb this hand, if so, no one has
+        missed the bb....
+
+        else set sb position to none
+
+        else set every player from the person who was bb to the beginning of
+        the list ind[0] to missed bb....
+
+        if the guy who was the bb is MIA, the guy who was utg should be in ind[0]
+        and he will pay bb this round, pay normal sb next hand...
+
+
+        if the guy who was bb last hand is in player order, and he is not in sb
+        ind[0], then everyone with a lower indice then him sets missed_bb...
+
+
+        if the guy who was sb last hand is not in the button this hand, anyone
+        further up the list than him as a missed sb....
+
+        if there is anyone between the current sb and the former sb, they missed
+        the sb
+        if last_order[0] is None, there are no missed sb
+        if last hand first pos was None,
+
+
+        if you were not in last hand and have missed a blind
+        check
+
     Edge logic for missed blinds etc...
 
 Create pot
