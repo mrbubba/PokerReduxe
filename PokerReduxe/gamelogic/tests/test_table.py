@@ -7,7 +7,6 @@ from player import Player
 class TestTable(unittest.TestCase):
     """ Do we have a working table object? """
 
-
     def setUp(self):
         self.player1 = Player("player1")
         self.player2 = Player("player2")
