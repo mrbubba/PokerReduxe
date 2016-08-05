@@ -92,6 +92,7 @@ class TestApp(unittest.TestCase):
     def test_set_missed_sb(self):
         """ Can we set missed sb to True """
         self.player2.active = False
+        self.player2.acted = True
         app.move_button(self.table)
         self.assertTrue(self.player2.missed_sb)
 

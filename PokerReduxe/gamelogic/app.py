@@ -53,6 +53,7 @@ import random
 #     table.pots.append(pot)
 #     return
 
+
 def check_active_players(table):
 
     # Grab active players at table
@@ -90,6 +91,7 @@ def check_active_players(table):
                 if i > ind_order[-1]:
                     i = 0
 
+
 def move_button(table):
     """ Setting the table """
 
@@ -97,17 +99,16 @@ def move_button(table):
     table.last_order = table.player_order[:]
 
     # Check for None value remove if present
-    if table.player_order[0] == None:
+    if table.player_order[0] is None:
         table.player_order.pop(0)
 
     # Check active players
     check_active_players(table)
 
-
     # Check for MIA BB
     if table.last_order[1] not in table.player_order:
         table.player_order.insert(0, None)
-    elif table.last_order[0] != None:
+    elif table.last_order[0] is not None:
         # Pop off first value in player order and add to end
         x = table.player_order.pop(0)
         table.player_order.append(x)
@@ -135,34 +136,29 @@ def move_button(table):
 
     # Check/Set missed sb
     # if last sb is none, and current sb is none, nobody missed sb
-    if table.last_order[0] != None:
+    if table.last_order[0] is not None:
         # Grab last sb seat number
-        for k,v in table.seats.items():
+        for k, v in table.seats.items():
             if v == table.last_order[0]:
                 last_sb_key = k + 1
 
         # Grab current sb seat number
-        if table.player_order[0] != None:
-            for k,v in table.seats.items():
+        if table.player_order[0] is not None:
+            for k, v in table.seats.items():
                 if v == table.player_order[0]:
                     current_sb_key = k
         else:
-            for k,v in table.seats.items():
+            for k, v in table.seats.items():
                 if v == table.player_order[1]:
                     current_sb_key = k
 
         # Iterate seats between last sb and current sb to missed_sb True
         while last_sb_key != current_sb_key:
-            if table.seats[last_sb_key].acted:
+            if table.seats[last_sb_key].acted or table.seats[last_sb_key].missed_bb:
                 table.seats[last_sb_key].missed_sb = True
             last_sb_key += 1
             if last_sb_key > len(table.seats):
                 last_sb_key = 1
-
-
-    # TODO: Check missed blinds
-    #
-
 
 
 # @param table The table obj to set player_order
