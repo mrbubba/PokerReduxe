@@ -35,8 +35,14 @@ Get sb position(players, lastSmalll, lastBig)  //returns ordered players
         check
 
     Edge logic for missed blinds etc...
-
+Missed blind corner cases
 Create pot
+    put in players list
+    Collect ante
+    any equity larger than the bb gets knocked off p.equity and added to amount
+    sb does not get collected
+
+
 Collect sb,bb,ante (and missed blinds)
 Deal Hole cards()
     Create/Randomize deck

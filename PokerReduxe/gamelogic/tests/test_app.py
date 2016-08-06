@@ -35,6 +35,12 @@ class TestApp(unittest.TestCase):
         self.assertEqual(6, len(six_players))
         self.assertEqual(5, len(five_players))
 
+    def test_remove_broke_player(self):
+        """ Can we remove players with zero chips left in stack """
+        self.player1.stack = 0
+        five_players = app.get_active_players(self.table)
+        self.assertEqual(5, len(five_players))
+
     def test_reset_player_order(self):
         """ Can we randomly set the button? """
         call1 = app.reset_player_order(self.table)[:]
@@ -95,6 +101,65 @@ class TestApp(unittest.TestCase):
         self.player2.acted = True
         app.move_button(self.table)
         self.assertTrue(self.player2.missed_sb)
+
+    def test_remove_missed_blinds_from_button(self):
+        """ Can we remove people who owe blinds in the button position? """
+        self.player6.missed_bb = True
+        self.player5.missed_sb = True
+        app.missed_blind_corner_cases(self.table)
+        self.assertEqual(4, len(self.table.player_order))
+
+    def test_bought_button(self):
+        """ Can we appropriately allow someone to buy the button? """
+        self.player1.missed_bb = True
+        app.missed_blind_corner_cases(self.table)
+        self.assertEqual(3, self.player1.equity)
+        self.assertEqual(0, self.player2.equity)
+
+    def test_only_one_bought_button(self):
+        """ Can we ensure only one bought button? """
+        self.player1.missed_bb = True
+        self.player2.missed_bb = True
+        app.missed_blind_corner_cases(self.table)
+        self.assertEqual(5, len(self.table.player_order))
+
+    def test_collect_all_blinds(self):
+        """ Can we collect all of the blinds? """
+        app.collect_blinds(self.table)
+        self.assertEqual(99, self.player1.stack)
+        self.assertEqual(1, self.player1.equity)
+        self.assertEqual(98, self.player2.stack)
+        self.assertEqual(2, self.player2.equity)
+
+    def test_dont_collect_blinds_if_button_has_been_bought(self):
+        """ Can we ensure that we dont collect bb if button is bought """
+        self.player1.equity = 3
+        app.collect_blinds(self.table)
+        self.assertEqual(3, self.player1.equity)
+        self.assertEqual(0, self.player2.equity)
+
+    def test_collect_missed_blinds(self):
+        """ Can we ensure that missed blinds are collected? """
+        self.player3.missed_sb = True
+        self.player3.missed_bb = True
+        self.player4.missed_bb = True
+        self.player5.missed_sb = True
+        app.collect_missed_blinds(self.table)
+        self.assertEqual(3, self.player3.equity)
+        self.assertEqual(98, self.player4.stack)
+        self.assertEqual(False, self.player5.missed_sb)
+
+    def test_create_initial_pot(self):
+        """ Can we ensure a proper initial pot is created? """
+        self.player3.equity = 3
+        self.player4.equity = 2
+        self.player5.stack = 10
+        self.table.ante = 10
+        app.create_initial_pot(self.table)
+        self.assertEqual(12, self.player3.equity)
+        self.assertEqual(61, self.table.pots[0].amount)
+        self.assertEqual(10, self.table.pots[0].side_pots[0])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,3 +11,7 @@ class Pot():
 
 
     """
+    def __init__(self, players, amount):
+        self.players = players
+        self.amount = amount
+        self.side_pots = []
