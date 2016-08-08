@@ -54,9 +54,9 @@ def set_button(table):
     """ Creating the hand list """
     active_players = get_active_players(table)
 
-    for seat in table.seats:
-        seat.missed_sb = False
-        seat.missed_bb = False
+    for k, v in table.seats.items():
+        v.missed_sb = False
+        v.missed_bb = False
 
     # Grab random index
     players_length = len(active_players)
@@ -185,6 +185,17 @@ def move_button(table):
 def head_to_head(table):
     """ If head to head set table for head to head """
     active_players = get_active_players(table)
+
+    if table.last_order:
+        if len(table.last_order) == 2:
+
+            table.player_order = table.last_order[:]
+            x = table.player_order.pop()
+
+
+    else:
+
+
     # Rearrange active players for head to head
     x = active_players.pop(0)
     active_players.append(x)
