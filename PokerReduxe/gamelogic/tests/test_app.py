@@ -41,13 +41,13 @@ class TestApp(unittest.TestCase):
         five_players = app.get_active_players(self.table)
         self.assertEqual(5, len(five_players))
 
-    def test_reset_player_order(self):
+    def test_set_button(self):
         """ Can we randomly set the button? """
-        call1 = app.reset_player_order(self.table)[:]
-        call2 = app.reset_player_order(self.table)[:]
-        call3 = app.reset_player_order(self.table)[:]
-        call4 = app.reset_player_order(self.table)[:]
-        call5 = app.reset_player_order(self.table)[:]
+        call1 = app.set_button(self.table)[:]
+        call2 = app.set_button(self.table)[:]
+        call3 = app.set_button(self.table)[:]
+        call4 = app.set_button(self.table)[:]
+        call5 = app.set_button(self.table)[:]
 
         self.assertFalse(call1 == call2 == call3 == call4 == call5)
 

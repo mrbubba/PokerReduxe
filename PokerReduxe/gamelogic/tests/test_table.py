@@ -34,7 +34,6 @@ class TestTable(unittest.TestCase):
             self.table.join(1, self.player2, 100)
         self.assertTrue(self.table.seats[1].name == self.player1.name)
 
-
     def test_player_can_only_have_one_seat_at_the_table(self):
         """A player should only occupy one seat per table."""
         self.table.join(1, self.player1, 100)

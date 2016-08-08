@@ -134,7 +134,6 @@ def move_button(table):
             if last_bb_key > len(table.seats):
                 last_bb_key = 1
 
-
     # Check/Set missed sb
     # if last sb is none, and current sb is none, nobody missed sb
     if table.last_order[0] is not None:
@@ -163,7 +162,7 @@ def move_button(table):
 
 
 # @param table The table obj to set player_order
-def reset_player_order(table):
+def set_button(table):
     """ Creating the hand list """
     active_players = get_active_players(table)
 
@@ -230,7 +229,7 @@ def get_active_players(table):
         # Check for Zero chips in player stack
         if player.stack == 0:
             player.active = False
-        if player.active == True:
+        if player.active:
             active_players.append(player)
     return active_players
 
@@ -257,7 +256,7 @@ def missed_blind_corner_cases(table):
             table.player_order[0].stack = 0
 
         x = False
-        while x == False:
+        while not x:
             # Only one person can buy button at a time
             if table.player_order[1].missed_bb:
                 table.player_order.pop(1)
@@ -290,6 +289,7 @@ def collect_blinds(table):
     bb.missed_bb = False
     bb.missed_sb = False
 
+
 def collect_missed_blinds(table):
     for player in table.player_order:
         if player.missed_bb:
@@ -309,6 +309,7 @@ def collect_missed_blinds(table):
                 player.equity += sb.stack
                 player.stack = 0
             player.missed_sb = False
+
 
 def create_initial_pot(table):
 
@@ -341,7 +342,6 @@ def create_initial_pot(table):
     table.pots.append(pot)
 
 
-
 def set_player_table_attributes(table):
     """ Resets players hole card and acted attributes and community_cards """
 
@@ -350,6 +350,7 @@ def set_player_table_attributes(table):
     for player in table.player_order:
         player.hole_cards = []
         player.acted = False
+
 
 def create_deck(table):
     """ Creats a randomized deck """
@@ -362,6 +363,7 @@ def create_deck(table):
 
     # Shuffle Deck
     random.shuffle(table.deck)
+
 
 def deal_hole(table):
     """ Deals 2 hole cards to each player in hand """
