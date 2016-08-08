@@ -14,6 +14,8 @@ class Table():
         @property {list} last_order A list of the last betting order
         @property {list} player_order A list of the current betting order sb first
         @property {list} community_cards A list containing card names
+        @property {int} bet_increment The minimum amount the bet can be raised
+        @property {int} current_bet Amount to call
 
 
     METHODS:
@@ -39,6 +41,8 @@ class Table():
         self.last_order = []
         self.player_order = []
         self.community_cards = []
+        self.bet_increment = bb_amount
+        self.current_bet = 0
 
     # @param seats The num of seats passed in instantiation
     # @return null

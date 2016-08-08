@@ -19,7 +19,6 @@ class Player(object):
 
             @method {} bet Add bet to equity and sub from stack
             @method {} fold Removes player from all pot objects
-            @method  away Toggles players active status
 
      """
     def __init__(self, name):

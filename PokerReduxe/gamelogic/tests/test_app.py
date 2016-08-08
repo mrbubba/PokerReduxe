@@ -179,17 +179,6 @@ class TestApp(unittest.TestCase):
         self.assertEqual(x, 6)
         self.assertEqual(40, len(self.table.deck))
 
-    def test_head_to_head(self):
-        """ Can we set up a head to head hand """
-        x = 3
-        while x < 7:
-            self.table.seats[x].active = False
-            x += 1
-        app.head_to_head(self.table)
-        self.assertEqual(self.table.player_order[0], self.player2)
-        self.assertEqual(98, self.table.player_order[0].stack)
-        self.assertEqual(99, self.table.player_order[1].stack)
-        self.assertTrue(self.table.player_order[1].action)
 
 if __name__ == '__main__':
     unittest.main()

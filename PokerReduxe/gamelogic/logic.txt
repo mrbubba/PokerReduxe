@@ -36,14 +36,13 @@ Get sb position(players, lastSmalll, lastBig)  //returns ordered players
 
     Edge logic for missed blinds etc...
 Missed blind corner cases
-Create pot
-    put in players list
-    Collect ante
-    any equity larger than the bb gets knocked off p.equity and added to amount
-    sb does not get collected
-
-
 Collect sb,bb,ante (and missed blinds)
+
+Create pot
+put in players list
+Collect ante
+any equity larger than the bb gets knocked off p.equity and added to amount
+sb does not get collected
 Set_player_table_attributes()
 Create_deck()
 Deal Hole cards()
@@ -80,3 +79,32 @@ if played is true // end round logic
 
 
 Head to Head
+
+
+player_order = [0,1,2,3,4]
+
+action_time(table, inc):
+    pot = table.pots[-1]
+    if pot.players[inc].acted == False and pot.player[inc].stack > 0:
+        pot.players[inc].action = True
+    elif table.current_bet > pot.players[inc].equity and pot.player[inc].stack > 0:
+        pot.players[inc].action = True
+    else:
+        evaluate_pot(table)
+
+
+
+evaluate_pot(table):
+    pot = table.pots[-1]
+    if pot.side_pots:
+        sorted(pot.side_pots)
+        while pot.side_pots:
+
+            amount = pot.side_pots.pop(0)
+            x = 0
+            new_players = []
+            for player in pot.players:
+                player.equity -= amount
+                x += 1
+                new_players.append(player)
+            amount = amount * x

@@ -11,7 +11,6 @@ def get_active_players(table):
             active_players.append(player)
     return active_players
 
-
 def check_active_players(table):
 
     # Grab active players at table
@@ -48,6 +47,28 @@ def check_active_players(table):
                 i += 1
                 if i > ind_order[-1]:
                     i = 0
+
+def new_hand(table):
+    # Helper function to faciliate new hand
+
+    active_players = get_active_players(table)
+
+    # determine if move or set button
+
+    # set button if going from head to head to 3 or more
+    if len(active_players) > 2 and len(table.player_order) == 2:
+        set_button(table)
+    # move button for head to head
+    elif len(active_players) == 2 and len(table.player_order) == 2:
+        move_button(table)
+    # set button if going from 3 or more to head to head
+    elif len(active_players) == 2 and len(table.player_order) > 2:
+        set_button(table)
+    # move button if there is more than 2 players and a last order was set
+    elif table.player_order:
+        move_button(table)
+    else:
+        set_button(table)
 
 # @param table The table obj to set player_order
 def set_button(table):
@@ -113,7 +134,6 @@ def set_button(table):
             sb = 1
 
     return table.player_order
-
 
 def move_button(table):
     """ Setting the table """
@@ -182,33 +202,6 @@ def move_button(table):
             if last_sb_key > len(table.seats):
                 last_sb_key = 1
 
-def head_to_head(table):
-    """ If head to head set table for head to head """
-    active_players = get_active_players(table)
-
-    if table.last_order:
-        if len(table.last_order) == 2:
-
-            table.player_order = table.last_order[:]
-            x = table.player_order.pop()
-
-
-    else:
-
-
-    # Rearrange active players for head to head
-    x = active_players.pop(0)
-    active_players.append(x)
-
-    # Set last hand to old player order
-    table.last_order = table.player_order[:]
-    # Set player order to equal button as bb and sb as bb
-    table.player_order = active_players[:]
-    collect_blinds(table)
-    create_initial_pot(table)
-    deal_hole(table)
-    # action_time(table, 1)
-
 def missed_blind_corner_cases(table):
 
     # Remove people who missed blinds from button position
@@ -237,7 +230,6 @@ def missed_blind_corner_cases(table):
                 table.player_order.pop(1)
             else:
                 x = True
-
 
 def collect_blinds(table):
     if len(table.player_order) == 2:
@@ -268,7 +260,6 @@ def collect_blinds(table):
     bb.missed_bb = False
     bb.missed_sb = False
 
-
 def collect_missed_blinds(table):
     for player in table.player_order:
         if player.missed_bb:
@@ -288,7 +279,6 @@ def collect_missed_blinds(table):
                 player.equity += sb.stack
                 player.stack = 0
             player.missed_sb = False
-
 
 def create_initial_pot(table):
 
@@ -310,7 +300,8 @@ def create_initial_pot(table):
                 player.equity = table.bb_amount + table.ante
 
     # instantiate pot object
-    pot = Pot(table.player_order, amount)
+    players = table.player_order[:]
+    pot = Pot(players, amount)
 
     # append side pots to Pot obj in case of all-in players
     if side_pots_tmp:
@@ -320,7 +311,6 @@ def create_initial_pot(table):
     # Add the initial pot to the table
     table.pots.append(pot)
 
-
 def set_player_table_attributes(table):
     """ Resets players hole card and acted attributes and community_cards """
 
@@ -329,7 +319,6 @@ def set_player_table_attributes(table):
     for player in table.player_order:
         player.hole_cards = []
         player.acted = False
-
 
 def create_deck(table):
     """ Creats a randomized deck """
@@ -343,7 +332,6 @@ def create_deck(table):
     # Shuffle Deck
     random.shuffle(table.deck)
 
-
 def deal_hole(table):
     """ Deals 2 hole cards to each player in hand """
     set_player_table_attributes(table)
@@ -352,3 +340,72 @@ def deal_hole(table):
     for player in table.player_order:
         player.hole_cards.append(table.deck.pop(0))
         player.hole_cards.append(table.deck.pop(0))
+
+def action_time(table, inc=0):
+
+    pot = table.pots[-1]
+
+    # list comprehension to check for all in players, break if so
+    if not [x for x in pots.players if x.stack]:
+        evaluate_pot(table)
+
+    if pot.players[inc].acted == False and pot.player[inc].stack > 0:
+        pot.players[inc].action = True
+    elif table.current_bet > pot.players[inc].equity and pot.player[inc].stack > 0:
+        pot.players[inc].action = True
+    elif pot.players[inc].stack == 0:
+        x = inc + 1
+        if x > len(pot.players):
+            x = 0
+        action_time(table, x)
+    else:
+        evaluate_pot(table)
+
+def evaluate_pot(table):
+    """ Evaluates pot on table and creates side pots if neccessary """
+    pot = table.pots[-1]
+    if pot.side_pots:
+        sorted(pot.side_pots)
+        while pot.side_pots:
+
+            amount = pot.side_pots.pop(0)
+            x = 0
+            new_players = []
+            for player in pot.players:
+                player.equity -= amount
+                x += 1
+                new_players.append(player)
+                if player.stack == 0:
+                    pot.players.remove(player)
+
+            amount = amount * x
+            amount += pot.amount
+            pot.amount = 0
+            new_pot = Pot(new_players, amount)
+            table.pots.prepend(new_pot)
+    for player in pot.players:
+        pot.amount += player.equity
+        player.equity = 0
+    if len(pot.players) == 1:
+        if len(table.pots) == 1:
+            # Give last guy in pot money
+            pot.players[0].stack += pot.amount
+            # Start new hand
+            new_hand(table)
+        else:
+            while len(table.community_cards) < 5:
+                deal(table)
+            analyze(table)
+    else:
+        if len(table.community_cards) < 5:
+            deal(table)
+        else:
+            analyze(table)
+
+def deal(table):
+    if len(table.community_cards) == 0:
+        for x in range(0,3):
+            table.community_cards.append(table.deck.pop(0))
+    else:
+        table.community_cards.append(table.deck.pop(0))
+    action_time(table)
