@@ -1,58 +1,15 @@
 import random
 from pot import Pot
-#
-# # @param {obj} table the table to draw info from
-# # @return {obj} payload pot, list of players sb first
-# def runGame():
-#     setupTable(table)
-#     pushAction(table.players, table.pot)
-#
-# def setupTable(table):
-#     getPlayerList()  #
-#     create_pot()
-#     pass
-#
-# # @param {list} pot A list of pot objects
-# # @param {list} activeplayers
-# def pushAction(players, pot):
-#     if 2 peeps left:
-#         # reward winner
-#         return Analyzer(players,pot)
-#
-#     else
-#         # remove players and mod pots
-#         getactiveplayers
-#
-#
-#
-#
-#     get_active_players = [x for x in table.seats.players]
-#     betting_order = getBettingOrder(table, get_active_players)
-#     check_missed_blinds = table.check_missed_blinds(betting_order)
-#     betting_order = getBettingOrder(table, check_missed_blinds)
-#     button = getButton()
-#
-#
-#     create_side_pot(table, pot)
-#
-#         return pushAction(table, pot)
-#
-#
-# def create_side_pot(table, pot):
-#     side_pots = table.pots[-1].side_pots
-#     if side_pots:
-#         side_pots = side_pots.order()
-#             while side_pots:
-#                 players = pot.players[:]
-#                 amount = side_pots.pop(0)
-#
-#
-#         create_pot(table, players)
-#
-# def create_pot(table, players):
-#     pot = Pot(table, players)
-#     table.pots.append(pot)
-#     return
+
+def get_active_players(table):
+    active_players = []
+    for player in table.seats.values():
+        # Check for Zero chips in player stack
+        if player.stack == 0:
+            player.active = False
+        if player.active:
+            active_players.append(player)
+    return active_players
 
 
 def check_active_players(table):
@@ -91,6 +48,71 @@ def check_active_players(table):
                 i += 1
                 if i > ind_order[-1]:
                     i = 0
+
+# @param table The table obj to set player_order
+def set_button(table):
+    """ Creating the hand list """
+    active_players = get_active_players(table)
+
+    for seat in table.seats:
+        seat.missed_sb = False
+        seat.missed_bb = False
+
+    # Grab random index
+    players_length = len(active_players)
+    i = random.randint(0, players_length - 1)
+    x = i + 1
+
+    # loop through players, assigning order, until i is reached
+    table.player_order = []
+    ind_order = []
+    ind_order.append(i)
+    while x != i:
+        if x >= players_length:
+            if i == 0:
+                break
+            x = 0
+        ind_order.append(x)
+        x += 1
+    for ind in ind_order:
+        table.player_order.append(active_players[ind])
+
+    # Have to set missed blind status for inactive players up front
+    for k, v in table.seats.items():
+        # Grab key of button
+        if v == table.player_order[-1]:
+            button = k
+        # Grab key of sb
+        if v == table.player_order[0]:
+            sb = k
+        # Grab key of bb
+        if v == table.player_order[1]:
+            bb = k
+
+    # Set missed_sb for immediately inactive players between button and sb
+    button += 1
+    if button > len(table.seats):
+        button = 1
+    while button != sb:
+        if table.seats[button]:
+            table.seats[button].missed_sb = True
+        button += 1
+        if button > len(table.seats):
+            button = 1
+
+    # Set missed_bb for immediately inactive players between sb and bb
+    sb += 1
+    if sb > len(table.seats):
+        sb = 1
+
+    while sb != bb:
+        if table.seats[sb]:
+            table.seats[sb].missed_bb = True
+        sb += 1
+        if sb > len(table.seats):
+            sb = 1
+
+    return table.player_order
 
 
 def move_button(table):
@@ -160,79 +182,21 @@ def move_button(table):
             if last_sb_key > len(table.seats):
                 last_sb_key = 1
 
-
-# @param table The table obj to set player_order
-def set_button(table):
-    """ Creating the hand list """
+def head_to_head(table):
+    """ If head to head set table for head to head """
     active_players = get_active_players(table)
+    # Rearrange active players for head to head
+    x = active_players.pop(0)
+    active_players.append(x)
 
-    # Grab random index
-    players_length = len(active_players)
-    i = random.randint(0, players_length - 1)
-    x = i + 1
-
-    # loop through players, assigning order, until i is reached
-    table.player_order = []
-    ind_order = []
-    ind_order.append(i)
-    while x != i:
-        if x >= players_length:
-            if i == 0:
-                break
-            x = 0
-        ind_order.append(x)
-        x += 1
-    for ind in ind_order:
-        table.player_order.append(active_players[ind])
-
-    # Have to set missed blind status for inactive players up front
-    for k, v in table.seats.items():
-        # Grab key of button
-        if v == table.player_order[-1]:
-            button = k
-        # Grab key of sb
-        if v == table.player_order[0]:
-            sb = k
-        # Grab key of bb
-        if v == table.player_order[1]:
-            bb = k
-
-    # Set missed_sb for immediately inactive players between button and sb
-    button += 1
-    if button > len(table.seats):
-        button = 1
-    while button != sb:
-        if table.seats[button]:
-            table.seats[button].missed_sb = True
-        button += 1
-        if button > len(table.seats):
-            button = 1
-
-    # Set missed_bb for immediately inactive players between sb and bb
-    sb += 1
-    if sb > len(table.seats):
-        sb = 1
-
-    while sb != bb:
-        if table.seats[sb]:
-            table.seats[sb].missed_bb = True
-        sb += 1
-        if sb > len(table.seats):
-            sb = 1
-
-    return table.player_order
-
-
-def get_active_players(table):
-    active_players = []
-    for player in table.seats.values():
-        # Check for Zero chips in player stack
-        if player.stack == 0:
-            player.active = False
-        if player.active:
-            active_players.append(player)
-    return active_players
-
+    # Set last hand to old player order
+    table.last_order = table.player_order[:]
+    # Set player order to equal button as bb and sb as bb
+    table.player_order = active_players[:]
+    collect_blinds(table)
+    create_initial_pot(table)
+    deal_hole(table)
+    # action_time(table, 1)
 
 def missed_blind_corner_cases(table):
 
@@ -265,8 +229,12 @@ def missed_blind_corner_cases(table):
 
 
 def collect_blinds(table):
-    sb = table.player_order[0]
-    bb = table.player_order[1]
+    if len(table.player_order) == 2:
+        sb = table.player_order[1]
+        bb = table.player_order[0]
+    else:
+        sb = table.player_order[0]
+        bb = table.player_order[1]
 
     # Check for bought button
     if sb is not None and sb.equity > 0:
@@ -367,7 +335,7 @@ def create_deck(table):
 
 def deal_hole(table):
     """ Deals 2 hole cards to each player in hand """
-
+    set_player_table_attributes(table)
     create_deck(table)
 
     for player in table.player_order:
