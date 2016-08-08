@@ -160,6 +160,24 @@ class TestApp(unittest.TestCase):
         self.assertEqual(61, self.table.pots[0].amount)
         self.assertEqual(10, self.table.pots[0].side_pots[0])
 
+    def test_deck_is(self):
+        """ Can we ensure that we have a full deck? """
+        app.create_deck(self.table)
+        self.assertEqual(52, len(self.table.deck))
+        unique_deck = self.table.deck[:]
+        unique_deck = set(unique_deck)
+        unique_deck = list(unique_deck)
+        self.assertEqual(52, len(unique_deck))
+
+    def test_deal_hole_cards(self):
+        """ Can we ensure hole cards are dealt appropriately """
+        app.deal_hole(self.table)
+        x = 0
+        for player in self.table.player_order:
+            if len(player.hole_cards) == 2:
+                x +=1
+        self.assertEqual(x, 6)
+        self.assertEqual(40, len(self.table.deck))
 
 if __name__ == '__main__':
     unittest.main()

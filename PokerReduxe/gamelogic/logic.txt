@@ -44,19 +44,15 @@ Create pot
 
 
 Collect sb,bb,ante (and missed blinds)
+Set_player_table_attributes()
+Create_deck()
 Deal Hole cards()
-    Create/Randomize deck
     deal hole cards
 ActionTime()
 
 
 
-ActionTime:
-First Bettor acts (if comm==0 ind[2] else ind[0]) //
-Other players act
-    if played is true // end round logic
-
-Create Pot from side pots
+ActionTime(table):
 Check for end case
     If active players is 1 AND only 1 Pot
         Award Pot to player
@@ -67,11 +63,16 @@ Check for end case
 
     IF comm_cards equal 5
         analyzer
-
-    ...etc
 Deal
-    if comm cards == 0
-        deal 3
-    else:
-        deal 1
-    action()
+if comm cards == 0
+deal 3
+else:
+deal 1
+action()
+
+First Bettor acts (if comm==0 ind[2] else ind[0]) //
+Other players act
+if played is true // end round logic
+
+        Create Pot from side pots
+    ...etc

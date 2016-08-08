@@ -13,6 +13,7 @@ class Table():
         @property {list} pots A list of pot objects
         @property {list} last_order A list of the last betting order
         @property {list} player_order A list of the current betting order sb first
+        @property {list} community_cards A list containing card names
 
 
     METHODS:
@@ -37,6 +38,7 @@ class Table():
         self.pots = []
         self.last_order = []
         self.player_order = []
+        self.community_cards = []
 
     # @param seats The num of seats passed in instantiation
     # @return null
@@ -60,7 +62,7 @@ class Table():
 
         # ensure proper buyin
         if stack not in range(min_buy, max_buy):
-            raise ValueError('Buy in must be between {} and {}.' .format(min_buy, self.buy_in[1]))
+            raise ValueError('Buy in must be between {} and {}.'.format(min_buy, self.buy_in[1]))
 
         # ensure seat is empty
         if self.seats[key] == None:

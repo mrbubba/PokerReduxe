@@ -331,6 +331,7 @@ def create_initial_pot(table):
 
     # instantiate pot object
     pot = Pot(table.player_order, amount)
+
     # append side pots to Pot obj in case of all-in players
     if side_pots_tmp:
         for p in side_pots_tmp:
@@ -338,3 +339,35 @@ def create_initial_pot(table):
 
     # Add the initial pot to the table
     table.pots.append(pot)
+
+
+
+def set_player_table_attributes(table):
+    """ Resets players hole card and acted attributes and community_cards """
+
+    table.community_cards = []
+
+    for player in table.player_order:
+        player.hole_cards = []
+        player.acted = False
+
+def create_deck(table):
+    """ Creats a randomized deck """
+    # Make a standard poker deck (14 represents an ace)
+    for value in range(2, 15):
+        table.deck.append('{}h'.format(value))
+        table.deck.append('{}d'.format(value))
+        table.deck.append('{}c'.format(value))
+        table.deck.append('{}s'.format(value))
+
+    # Shuffle Deck
+    random.shuffle(table.deck)
+
+def deal_hole(table):
+    """ Deals 2 hole cards to each player in hand """
+
+    create_deck(table)
+
+    for player in table.player_order:
+        player.hole_cards.append(table.deck.pop(0))
+        player.hole_cards.append(table.deck.pop(0))
