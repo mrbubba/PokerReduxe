@@ -1,7 +1,9 @@
 import unittest
+from unittest.mock import MagicMock
 
 from table import Table
 from player import Player
+from pot import Pot
 import app
 
 class TestApp(unittest.TestCase):
@@ -27,6 +29,11 @@ class TestApp(unittest.TestCase):
         for k,v in self.table.seats.items():
             self.table.player_order.append(v)
 
+        pot = Pot(self.table.player_order, 0)
+
+
+        self.table.pots.append(pot)
+
     def test_get_active_players(self):
         """ Can we grab a list of active players? """
         six_players = app.get_active_players(self.table)
@@ -48,6 +55,7 @@ class TestApp(unittest.TestCase):
         call3 = app.set_button(self.table)[:]
         call4 = app.set_button(self.table)[:]
         call5 = app.set_button(self.table)[:]
+
 
         self.assertFalse(call1 == call2 == call3 == call4 == call5)
 
@@ -131,6 +139,15 @@ class TestApp(unittest.TestCase):
         self.assertEqual(98, self.player2.stack)
         self.assertEqual(2, self.player2.equity)
 
+    def test_collect_blinds_head_to_head(self):
+        """ Can we set/collect the blinds for head to head appropriately? """
+        self.table.player_order = [self.player1, self.player2]
+        app.collect_blinds(self.table)
+        self.assertEqual(99, self.player2.stack)
+        self.assertEqual(1, self.player2.equity)
+        self.assertEqual(98, self.player1.stack)
+        self.assertEqual(2, self.player1.equity)
+
     def test_dont_collect_blinds_if_button_has_been_bought(self):
         """ Can we ensure that we dont collect bb if button is bought """
         self.player1.equity = 3
@@ -151,6 +168,7 @@ class TestApp(unittest.TestCase):
 
     def test_create_initial_pot(self):
         """ Can we ensure a proper initial pot is created? """
+        self.table.pots = []
         self.player3.equity = 3
         self.player4.equity = 2
         self.player5.stack = 10
@@ -179,6 +197,50 @@ class TestApp(unittest.TestCase):
         self.assertEqual(x, 6)
         self.assertEqual(40, len(self.table.deck))
 
+    def test_action_time_first_to_act(self):
+        """ If player has yet to play, can we set its action to True? """
+        app.action_time(self.table)
+        self.assertTrue(self.player1.action)
+
+    def test_action_time_second_pass(self):
+        """ If player has already acted, and been raised, can we set its action to True? """
+        self.table.current_bet = 20
+        self.player1.equity = 10
+        self.player1.acted = True
+        app.action_time(self.table)
+        self.assertTrue(self.player1.action)
+
+    def test_action_time_skip_all_in_player(self):
+        """ Can we skip an all in player? """
+        self.player1.stack = 0
+        app.action_time(self.table)
+        self.assertFalse(self.player1.action)
+        self.assertTrue(self.player2.action)
+
+    def test_evaluate_pot_creates_side_pots(self):
+        """ Can we create and append side pots appropriately? """
+        self.player1.stack = 0
+        self.player1.equity = 10
+        self.player2.stack = 0
+        self.player2.equity = 20
+        self.player3.stack = 0
+        self.player3.equity = 30
+        self.player4.stack = 0
+        self.player4.equity = 40
+        self.player5.stack = 0
+        self.player5.equity = 50
+        self.player6.stack = 0
+        self.player6.equity = 60
+
+        app.create_deck(self.table)
+
+        self.table.pots[-1].side_pots = [10, 40, 50, 20, 30, 60]
+        self.table.pots[-1].amount = 1000
+        app.evaluate_pot(self.table)
+
+        self.assertEqual(6, len(self.table.pots[-2].players))
+        self.assertEqual(1060, self.table.pots[-2].amount)
+        self.assertEqual(5, len(self.table.pots))
 
 if __name__ == '__main__':
     unittest.main()

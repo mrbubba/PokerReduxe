@@ -1,5 +1,7 @@
 import random
+
 from pot import Pot
+from analyze import analyze
 
 def get_active_players(table):
     active_players = []
@@ -52,6 +54,12 @@ def new_hand(table):
     # Helper function to faciliate new hand
 
     active_players = get_active_players(table)
+
+    # Make sure we have at least 2 players
+    # while len(active_players) < 2:
+    #     active_players = get_active_players(table)
+
+    # TODO:Include a way to remove game from lobby. Ends Game.
 
     # determine if move or set button
 
@@ -232,6 +240,8 @@ def missed_blind_corner_cases(table):
                 x = True
 
 def collect_blinds(table):
+    # Check for head to head
+    # Else normal order
     if len(table.player_order) == 2:
         sb = table.player_order[1]
         bb = table.player_order[0]
@@ -341,21 +351,28 @@ def deal_hole(table):
         player.hole_cards.append(table.deck.pop(0))
         player.hole_cards.append(table.deck.pop(0))
 
+    inc = 2
+    # Set Inc for head to head
+    if len(table.player_order) == 2:
+        inc = 1
+    action_time(table, inc)
+
 def action_time(table, inc=0):
 
     pot = table.pots[-1]
 
     # list comprehension to check for all in players, break if so
-    if not [x for x in pots.players if x.stack]:
+    current_players = [x for x in pot.players if x.stack > 0]
+    if not current_players:
         evaluate_pot(table)
 
-    if pot.players[inc].acted == False and pot.player[inc].stack > 0:
+    elif pot.players[inc].acted == False and pot.players[inc].stack > 0:
         pot.players[inc].action = True
-    elif table.current_bet > pot.players[inc].equity and pot.player[inc].stack > 0:
+    elif table.current_bet > pot.players[inc].equity and pot.players[inc].stack > 0:
         pot.players[inc].action = True
     elif pot.players[inc].stack == 0:
         x = inc + 1
-        if x > len(pot.players):
+        if x == len(pot.players):
             x = 0
         action_time(table, x)
     else:
@@ -365,9 +382,10 @@ def evaluate_pot(table):
     """ Evaluates pot on table and creates side pots if neccessary """
     pot = table.pots[-1]
     if pot.side_pots:
-        sorted(pot.side_pots)
+        # import pdb
+        # pdb.set_trace()
+        pot.side_pots = sorted(pot.side_pots)
         while pot.side_pots:
-
             amount = pot.side_pots.pop(0)
             x = 0
             new_players = []
@@ -375,21 +393,28 @@ def evaluate_pot(table):
                 player.equity -= amount
                 x += 1
                 new_players.append(player)
-                if player.stack == 0:
+            for player in pot.players:
+                if player.stack == 0 and player.equity == 0:
                     pot.players.remove(player)
+            for p in pot.side_pots:
+                p -= amount
 
             amount = amount * x
             amount += pot.amount
             pot.amount = 0
             new_pot = Pot(new_players, amount)
-            table.pots.prepend(new_pot)
+            table.pots.insert(0, new_pot)
+            if len(pot.players) == 1:
+                pot.side_pots = []
     for player in pot.players:
         pot.amount += player.equity
         player.equity = 0
     if len(pot.players) == 1:
-        if len(table.pots) == 1:
-            # Give last guy in pot money
-            pot.players[0].stack += pot.amount
+        # Give last guy in pot money
+        pot.players[0].stack += pot.amount
+        table.pots.pop()
+        if not table.pots:
+
             # Start new hand
             new_hand(table)
         else:
