@@ -3,6 +3,7 @@ import random
 from pot import Pot
 from analyze import analyze
 
+
 def get_active_players(table):
     active_players = []
     for player in table.seats.values():
@@ -12,6 +13,7 @@ def get_active_players(table):
         if player.active:
             active_players.append(player)
     return active_players
+
 
 def check_active_players(table):
 
@@ -50,6 +52,7 @@ def check_active_players(table):
                 if i > ind_order[-1]:
                     i = 0
 
+
 def new_hand(table):
     # Helper function to faciliate new hand
 
@@ -77,6 +80,7 @@ def new_hand(table):
         move_button(table)
     else:
         set_button(table)
+
 
 # @param table The table obj to set player_order
 def set_button(table):
@@ -142,6 +146,7 @@ def set_button(table):
             sb = 1
 
     return table.player_order
+
 
 def move_button(table):
     """ Setting the table """
@@ -210,6 +215,7 @@ def move_button(table):
             if last_sb_key > len(table.seats):
                 last_sb_key = 1
 
+
 def missed_blind_corner_cases(table):
 
     # Remove people who missed blinds from button position
@@ -238,6 +244,7 @@ def missed_blind_corner_cases(table):
                 table.player_order.pop(1)
             else:
                 x = True
+
 
 def collect_blinds(table):
     # Check for head to head
@@ -270,6 +277,7 @@ def collect_blinds(table):
     bb.missed_bb = False
     bb.missed_sb = False
 
+
 def collect_missed_blinds(table):
     for player in table.player_order:
         if player.missed_bb:
@@ -289,6 +297,7 @@ def collect_missed_blinds(table):
                 player.equity += sb.stack
                 player.stack = 0
             player.missed_sb = False
+
 
 def create_initial_pot(table):
 
@@ -321,6 +330,7 @@ def create_initial_pot(table):
     # Add the initial pot to the table
     table.pots.append(pot)
 
+
 def set_player_table_attributes(table):
     """ Resets players hole card and acted attributes and community_cards """
 
@@ -329,6 +339,7 @@ def set_player_table_attributes(table):
     for player in table.player_order:
         player.hole_cards = []
         player.acted = False
+
 
 def create_deck(table):
     """ Creats a randomized deck """
@@ -341,6 +352,7 @@ def create_deck(table):
 
     # Shuffle Deck
     random.shuffle(table.deck)
+
 
 def deal_hole(table):
     """ Deals 2 hole cards to each player in hand """
@@ -356,6 +368,7 @@ def deal_hole(table):
     if len(table.player_order) == 2:
         inc = 1
     action_time(table, inc)
+
 
 def action_time(table, inc=0):
 
@@ -377,6 +390,7 @@ def action_time(table, inc=0):
         action_time(table, x)
     else:
         evaluate_pot(table)
+
 
 def evaluate_pot(table):
     """ Evaluates pot on table and creates side pots if neccessary """
@@ -426,6 +440,7 @@ def evaluate_pot(table):
             deal(table)
         else:
             analyze(table)
+
 
 def deal(table):
     if len(table.community_cards) == 0:

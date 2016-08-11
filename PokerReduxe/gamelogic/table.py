@@ -1,4 +1,4 @@
-class Table():
+class Table(object):
     """
     Table holds the intermediate data needed for the app to drive the game
 
