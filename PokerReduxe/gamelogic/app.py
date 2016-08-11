@@ -401,25 +401,50 @@ def evaluate_pot(table):
         pot.side_pots = sorted(pot.side_pots)
         while pot.side_pots:
             amount = pot.side_pots.pop(0)
+
+            print(amount)
+            print("+++++++++++++++")
+
             x = 0
             new_players = []
             for player in pot.players:
                 player.equity -= amount
                 x += 1
                 new_players.append(player)
+
             for player in pot.players:
                 if player.stack == 0 and player.equity == 0:
                     pot.players.remove(player)
             for p in pot.side_pots:
-                p -= amount
+
+                print(p)
+
+                ind = pot.side_pots.index(p)
+                pot.side_pots[ind] -= amount
+
+            print(pot.side_pots)
 
             amount = amount * x
             amount += pot.amount
             pot.amount = 0
             new_pot = Pot(new_players, amount)
             table.pots.insert(0, new_pot)
+
+            print(len(table.pots[0].players))
+            print(table.pots[0].amount)
+            print("---------------------------------")
+
             if len(pot.players) == 1:
                 pot.side_pots = []
+
+        print(len(table.pots[-2].players))
+        print(len(table.pots))
+
+        foo = []
+        for x in table.pots:
+            foo.append(x)
+        print(len(foo[-2].players))
+        print(foo[-2].amount)
     for player in pot.players:
         pot.amount += player.equity
         player.equity = 0
