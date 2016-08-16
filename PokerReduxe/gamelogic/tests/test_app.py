@@ -1,13 +1,12 @@
 import unittest
-from unittest.mock import MagicMock
 
-from table import Table
+import app
 from player import Player
 from pot import Pot
-import app
+from table import Table
+
 
 class TestApp(unittest.TestCase):
-
     def setUp(self):
         self.player1 = Player("player1")
         self.player2 = Player("player2")
@@ -26,11 +25,10 @@ class TestApp(unittest.TestCase):
         self.table.join(6, self.player6, 100)
 
         # Set player order; happy path
-        for k,v in self.table.seats.items():
+        for k, v in self.table.seats.items():
             self.table.player_order.append(v)
 
         pot = Pot(self.table.player_order, 0)
-
 
         self.table.pots.append(pot)
 
@@ -55,7 +53,6 @@ class TestApp(unittest.TestCase):
         call3 = app.set_button(self.table)[:]
         call4 = app.set_button(self.table)[:]
         call5 = app.set_button(self.table)[:]
-
 
         self.assertFalse(call1 == call2 == call3 == call4 == call5)
 
@@ -186,6 +183,10 @@ class TestApp(unittest.TestCase):
         unique_deck = set(unique_deck)
         unique_deck = list(unique_deck)
         self.assertEqual(52, len(unique_deck))
+        spades = [x for x in self.table.deck if x.suit == "s"]
+        self.assertEqual(13, len(spades))
+        unique_deck = list(set(spades))
+        self.assertEqual(13, len(unique_deck))
 
     def test_deal_hole_cards(self):
         """ Can we ensure hole cards are dealt appropriately """
@@ -238,9 +239,11 @@ class TestApp(unittest.TestCase):
         self.table.pots[-1].amount = 1000
         app.evaluate_pot(self.table)
 
-        self.assertEqual(6, len(self.table.pots[-2].players))
-        self.assertEqual(1060, self.table.pots[-2].amount)
+        self.assertEqual(6, len(self.table.pots[-1].players))
+        self.assertEqual(1060, self.table.pots[-1].amount)
         self.assertEqual(5, len(self.table.pots))
+        self.assertEqual(5, len(self.table.community_cards))
+
 
 if __name__ == '__main__':
     unittest.main()

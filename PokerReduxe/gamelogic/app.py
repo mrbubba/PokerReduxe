@@ -1,7 +1,8 @@
 import random
 
-from pot import Pot
 from analyze import analyze
+from pot import Pot
+from card import Card
 
 
 def get_active_players(table):
@@ -16,7 +17,6 @@ def get_active_players(table):
 
 
 def check_active_players(table):
-
     # Grab active players at table
     active_players = get_active_players(table)
 
@@ -24,7 +24,6 @@ def check_active_players(table):
     for player in table.player_order:
         if player not in active_players:
             table.player_order.remove(player)
-
     # Add active players not in player order appropriately
     for player in active_players:
         if player not in table.player_order:
@@ -37,7 +36,7 @@ def check_active_players(table):
             # Order active seat keys in numerical order
             sorted(ind_order)
             # Finding seat num of first player in player_order
-            for k,v in table.seats.items():
+            for k, v in table.seats.items():
                 if v == table.player_order[0]:
                     i = k
                     x = i
@@ -54,7 +53,7 @@ def check_active_players(table):
 
 
 def new_hand(table):
-    # Helper function to faciliate new hand
+    # Helper function to facilitate new hand
 
     active_players = get_active_players(table)
 
@@ -98,8 +97,7 @@ def set_button(table):
 
     # loop through players, assigning order, until i is reached
     table.player_order = []
-    ind_order = []
-    ind_order.append(i)
+    ind_order = [i]
     while x != i:
         if x >= players_length:
             if i == 0:
@@ -110,6 +108,9 @@ def set_button(table):
     for ind in ind_order:
         table.player_order.append(active_players[ind])
 
+    button = 0
+    sb = 0
+    bb = 0
     # Have to set missed blind status for inactive players up front
     for k, v in table.seats.items():
         # Grab key of button
@@ -170,14 +171,16 @@ def move_button(table):
         table.player_order.append(x)
 
     # Check/Set missed bb
+    last_bb_key = None
     if table.last_order[1] in table.player_order:
         # Grab last bb seat number
-        for k,v in table.seats.items():
+        for k, v in table.seats.items():
             if v == table.last_order[1]:
                 last_bb_key = k + 1
 
         # Grab current bb seat number
-        for k,v in table.seats.items():
+        current_bb_key = None
+        for k, v in table.seats.items():
             if v == table.player_order[1]:
                 current_bb_key = k
 
@@ -193,11 +196,13 @@ def move_button(table):
     # if last sb is none, and current sb is none, nobody missed sb
     if table.last_order[0] is not None:
         # Grab last sb seat number
+        last_sb_key = None
         for k, v in table.seats.items():
             if v == table.last_order[0]:
                 last_sb_key = k + 1
 
         # Grab current sb seat number
+        current_sb_key = None
         if table.player_order[0] is not None:
             for k, v in table.seats.items():
                 if v == table.player_order[0]:
@@ -217,7 +222,6 @@ def move_button(table):
 
 
 def missed_blind_corner_cases(table):
-
     # Remove people who missed blinds from button position
     while len(table.player_order) > 2:
         button = table.player_order[-1]
@@ -285,7 +289,7 @@ def collect_missed_blinds(table):
                 player.equity += table.bb_amount
                 player.stack -= table.bb_amount
             else:
-                player.equity = bb.stack
+                player.equity = player.stack
                 player.stack = 0
             player.missed_bb = False
 
@@ -294,13 +298,12 @@ def collect_missed_blinds(table):
                 player.equity += table.sb_amount
                 player.stack -= table.sb_amount
             else:
-                player.equity += sb.stack
+                player.equity += player.stack
                 player.stack = 0
             player.missed_sb = False
 
 
 def create_initial_pot(table):
-
     amount = 0
     side_pots_tmp = []
     if table.ante > 0:
@@ -342,15 +345,28 @@ def set_player_table_attributes(table):
 
 
 def create_deck(table):
-    """ Creats a randomized deck """
+    """ Creates a randomized deck """
     # Make a standard poker deck (14 represents an ace)
-    for value in range(2, 15):
-        table.deck.append('{}h'.format(value))
-        table.deck.append('{}d'.format(value))
-        table.deck.append('{}c'.format(value))
-        table.deck.append('{}s'.format(value))
 
-    # Shuffle Deck
+    for value in range(2, 15):
+
+        if value > 10:
+            if value == 11:
+                name = 'Jack'
+            elif value == 12:
+                name = 'Queen'
+            elif value == 13:
+                name = 'King'
+            elif value == 14:
+                name = 'Ace'
+        else:
+            name = str(value)
+
+        table.deck.append(Card(name + "_Diamonds", value, "d"))
+        table.deck.append(Card(name + "_Hearts", value, "h"))
+        table.deck.append(Card(name + "_Spades", value, "s"))
+        table.deck.append(Card(name + "_Clubs", value, "c"))
+
     random.shuffle(table.deck)
 
 
@@ -371,7 +387,6 @@ def deal_hole(table):
 
 
 def action_time(table, inc=0):
-
     pot = table.pots[-1]
 
     # list comprehension to check for all in players, break if so
@@ -379,7 +394,7 @@ def action_time(table, inc=0):
     if not current_players:
         evaluate_pot(table)
 
-    elif pot.players[inc].acted == False and pot.players[inc].stack > 0:
+    elif not pot.players[inc].acted and pot.players[inc].stack > 0:
         pot.players[inc].action = True
     elif table.current_bet > pot.players[inc].equity and pot.players[inc].stack > 0:
         pot.players[inc].action = True
@@ -402,9 +417,6 @@ def evaluate_pot(table):
         while pot.side_pots:
             amount = pot.side_pots.pop(0)
 
-            print(amount)
-            print("+++++++++++++++")
-
             x = 0
             new_players = []
             for player in pot.players:
@@ -416,13 +428,8 @@ def evaluate_pot(table):
                 if player.stack == 0 and player.equity == 0:
                     pot.players.remove(player)
             for p in pot.side_pots:
-
-                print(p)
-
                 ind = pot.side_pots.index(p)
                 pot.side_pots[ind] -= amount
-
-            print(pot.side_pots)
 
             amount = amount * x
             amount += pot.amount
@@ -430,28 +437,18 @@ def evaluate_pot(table):
             new_pot = Pot(new_players, amount)
             table.pots.insert(0, new_pot)
 
-            print(len(table.pots[0].players))
-            print(table.pots[0].amount)
-            print("---------------------------------")
-
             if len(pot.players) == 1:
                 pot.side_pots = []
 
-        print(len(table.pots[-2].players))
-        print(len(table.pots))
-
-        foo = []
-        for x in table.pots:
-            foo.append(x)
-        print(len(foo[-2].players))
-        print(foo[-2].amount)
     for player in pot.players:
         pot.amount += player.equity
         player.equity = 0
+
     if len(pot.players) == 1:
         # Give last guy in pot money
         pot.players[0].stack += pot.amount
         table.pots.pop()
+
         if not table.pots:
 
             # Start new hand
@@ -469,7 +466,7 @@ def evaluate_pot(table):
 
 def deal(table):
     if len(table.community_cards) == 0:
-        for x in range(0,3):
+        for x in range(0, 3):
             table.community_cards.append(table.deck.pop(0))
     else:
         table.community_cards.append(table.deck.pop(0))

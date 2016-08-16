@@ -49,7 +49,7 @@ class Table(object):
     def _build_seats(self, seats):
         if seats not in range(2, 10):
             raise ValueError("Tables must have between 2 and 9 players.")
-        for i in range(1,seats + 1):
+        for i in range(1, seats + 1):
             self.seats[i] = None
 
     # @param key The key of the seat in seats dict.
@@ -80,7 +80,7 @@ class Table(object):
     def quit(self, player):
         player.table = None
         player.stack = 0
-        for k,v in self.seats.items():
+        for k, v in self.seats.items():
             if v == player:
                 self.seats[k] = None
 

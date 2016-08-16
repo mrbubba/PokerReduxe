@@ -6,6 +6,7 @@ class Player(object):
 
             @property {str} name Name of the player
             @property {list} hole_cards List of players hole cards
+            @property {list} hand Internal list used to determine hand rank
             @property {int} stack Number of players chips left on table
             @property {bool} active Indicator for active status
             @property {obj} table The table object that hosts this game
@@ -24,6 +25,7 @@ class Player(object):
     def __init__(self, name):
         self.name = name
         self.hole_cards = []
+        self.hand = []
         self.stack = 0
         self.active = True
         self.table = None
