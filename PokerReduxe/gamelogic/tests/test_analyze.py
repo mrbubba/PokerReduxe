@@ -164,11 +164,92 @@ class TestAnalyze(unittest.TestCase):
 
     def test_compare(self):
         """ Can we determine a single winner? """
-        pass
+        pot = analyze.setup(self.table)
+        analyze.order(pot)
+        analyze.flush(pot)
+        analyze.convert_to_card_value(pot)
+        analyze.matching(pot)
+        analyze.compare(pot)
+        expected = self.player1
+        self.assertEqual(expected, pot.players[-1])
+        self.assertTrue(len(pot.players) == 1)
 
     def test_compare_multiple(self):
         """ if there are multiple winners do we return all of them? """
-        pass
+        pot = analyze.setup(self.table)
+        pot.players[1].hole_cards[0].value = 14
+        pot.players[1].hole_cards[0].suit = 'h'
+        pot.players[1].hole_cards[1].value = 13
+        pot.players[1].hole_cards[1].suit = 'h'
+        analyze.order(pot)
+        analyze.flush(pot)
+        analyze.convert_to_card_value(pot)
+        analyze.matching(pot)
+        analyze.compare(pot)
+        expected = [self.player1, self.player2]
+        self.assertEqual(expected, pot.players)
+
+    def test_award(self):
+        """ can we award a single winner the entire pot? """
+        pot = analyze.setup(self.table)
+        analyze.order(pot)
+        analyze.flush(pot)
+        analyze.convert_to_card_value(pot)
+        analyze.matching(pot)
+        analyze.compare(pot)
+        analyze.award(pot, self.table.sb_amount)
+        self.assertTrue(self.player1.stack == 200)
+        self.assertTrue(len(pot.players) == 1)
+
+    def test_award_multiple(self):
+        """ Can we pay out evenly to multiple winners """
+        pot = analyze.setup(self.table)
+        pot.players[1].hole_cards[0].value = 14
+        pot.players[1].hole_cards[0].suit = 'h'
+        pot.players[1].hole_cards[1].value = 13
+        pot.players[1].hole_cards[1].suit = 'h'
+        analyze.order(pot)
+        analyze.flush(pot)
+        analyze.convert_to_card_value(pot)
+        analyze.matching(pot)
+        analyze.compare(pot)
+        analyze.award(pot, self.table.sb_amount)
+        expected = [self.player1, self.player2]
+        self.assertEqual(expected, pot.players)
+
+    def test_award_indivisible(self):
+        """Can we properly pay pots that don't divide
+        evenly?"""
+        pot = analyze.setup(self.table)
+        pot.amount = 101
+        pot.players[1].hole_cards[0].value = 14
+        pot.players[1].hole_cards[0].suit = 'h'
+        pot.players[1].hole_cards[1].value = 13
+        pot.players[1].hole_cards[1].suit = 'h'
+        analyze.order(pot)
+        analyze.flush(pot)
+        analyze.convert_to_card_value(pot)
+        analyze.matching(pot)
+        analyze.compare(pot)
+        analyze.award(pot, self.table.sb_amount)
+        expected1 = 151
+        expected2 = 150
+        self.assertEqual(expected1, pot.players[0].stack)
+        self.assertEqual(expected2, pot.players[1].stack)
+
+    def test_analyze(self):
+        """ Will analyzer run appropriately? """
+        pot = self.table.pots[-1]
+        pot.amount = 101
+        pot.players[1].hole_cards[0].value = 14
+        pot.players[1].hole_cards[0].suit = 'h'
+        pot.players[1].hole_cards[1].value = 13
+        pot.players[1].hole_cards[1].suit = 'h'
+        analyze.analyze(self.table)
+        expected1 = 151
+        expected2 = 150
+        self.assertEqual(expected1, pot.players[0].stack)
+        self.assertEqual(expected2, pot.players[1].stack)
 
 
 if __name__ == '__main__':
