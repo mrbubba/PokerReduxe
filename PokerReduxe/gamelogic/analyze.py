@@ -1,7 +1,3 @@
-from table import Table
-from pot import Pot
-
-
 def setup(table):
     """get the players in the pot and their hands"""
     pot = table.pots.pop()
@@ -134,13 +130,13 @@ def award(pot, sb):
     """ Awards the pot to the winners """
     if len(pot.players) == 1:
         pot.players[0].stack += pot.amount
-    elif (pot.amount/sb) % len(pot.players) == 0:
+    elif (pot.amount / sb) % len(pot.players) == 0:
         for player in pot.players:
             player.stack += pot.amount / len(pot.players)
     else:
         # if the pot isn't evenly divisible(in small blind units) subtract
         # out the remainder, and split the remaining pot up equally
-        remainder = (pot.amount/sb) % len(pot.players)
+        remainder = (pot.amount / sb) % len(pot.players)
         pot.amount -= (sb * remainder)
         # hand out the remainder one small blind unit at a time starting
         # with first to act
