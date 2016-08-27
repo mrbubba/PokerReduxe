@@ -3,6 +3,7 @@ import random
 from analyze import analyze
 from pot import Pot
 from card import Card
+from table import Table
 
 
 def get_active_players(table):
@@ -383,6 +384,7 @@ def deal_hole(table):
     # Set Inc for head to head
     if len(table.player_order) == 2:
         inc = 1
+    table.current_bet = table.bb_amount
     action_time(table, inc)
 
 
@@ -465,6 +467,7 @@ def evaluate_pot(table):
 
 
 def deal(table):
+    table.current_bet = 0
     if len(table.community_cards) == 0:
         for x in range(0, 3):
             table.community_cards.append(table.deck.pop(0))
