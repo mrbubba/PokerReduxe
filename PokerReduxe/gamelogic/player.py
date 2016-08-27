@@ -1,3 +1,4 @@
+from app import action_time
 class Player(object):
     """
     Player object to be assoc with table seats dictionary
@@ -35,35 +36,55 @@ class Player(object):
         self.missed_sb = False
         self.missed_bb = False
 
+    def _call_action(self):
+        """ After player has acted, player needs to call action on the next
+        player """
+        my_ind = self.table.pots[-1].players.index(self)
+        ind = my_ind + 1
+        if ind == len(self.table.pots[-1].players):
+            ind = 0
+        action_time(self.table, ind)
+
     def bet(self, amount):
         """When a player action is set to true, bet is the method by which
         a player bets calls or checks appropriately."""
-        # Do not let people bet negative
-        if amount < 0:
-            raise Exception("Bets can not be negative")
+        if action:
+            # Do not let people bet negative
+            if amount < 0:
+                raise Exception("Bets can not be negative")
 
-        # Check for all in bet
-        elif amount == self.stack:
-            self.table.pots[-1].side_pots.append(amount)
+            # Check for all in bet
+            elif amount == self.stack:
+                self.table.pots[-1].side_pots.append(amount)
 
-        elif amount < self.table.current_bet:
-            raise Exception("Must match the current bet")
+            elif amount < self.table.current_bet:
+                raise Exception("Must match the current bet")
 
-        # Check that bet/raise is at least the minimum
-        elif amount > self.table.current_bet and amount < (self.table.current_bet + self.table.bet_increment):
-            raise Exception("Minimum raise is {}".format(self.table.current_bet + self.table.bet_increment))
+            # Check that bet/raise is at least the minimum
+            elif amount > self.table.current_bet and amount < (self.table.current_bet + self.table.bet_increment):
+                raise Exception("Minimum raise is {}".format(self.table.current_bet + self.table.bet_increment))
 
-        # Do not let players bet more than stack
-        if amount > self.stack:
-            raise Exception("You can only bet what you have on the table!!")
+            # Do not let players bet more than stack
+            if amount > self.stack:
+                raise Exception("You can only bet what you have on the table!!")
 
-        # Set bet increment correctly
-        if amount > (self.table.current_bet + self.table.bet_increment):
-            self.table.bet_increment = amount - self.table.current_bet
+            # Set bet increment correctly
+            if amount > (self.table.current_bet + self.table.bet_increment):
+                self.table.bet_increment = amount - self.table.current_bet
 
-        # Take bet from stack and move to equity
-        self.stack -= amount
-        self.equity += amount
+            # Take bet from stack and move to equity
+            self.stack -= amount
+            self.equity += amount
 
-        # Set players action to False
-        self.action = False
+            # Set players action to False
+            self.action = False
+            self._call_action()
+
+    def fold(self):
+        """ Fold player and remove from all pots """
+        if action:
+            for pot in self.table.pots:
+                pot.players.remove(self)
+
+            self.action = False
+            self._call_action()

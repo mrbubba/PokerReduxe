@@ -66,7 +66,14 @@ class TestPlayer(unittest.TestCase):
 
     def test_call_action(self):
         """ Can we call action time appropriately """
-        pass
+        self.player._call_action()
+        self.assertTrue(self.player2.action)
+
+    def test_fold(self):
+        """ Can we fold a player out? """
+        self.player.fold()
+        self.assertNotIn(self.player, self.table.pots[0].players)
+        self.assertNotIn(self.player, self.table.pots[1].players)
 
 if __name__ == '__main__':
     unittest.main()

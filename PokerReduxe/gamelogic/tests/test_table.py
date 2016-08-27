@@ -8,8 +8,8 @@ class TestTable(unittest.TestCase):
     """ Do we have a working table object? """
 
     def setUp(self):
-        self.player1 = Player("player1")
-        self.player2 = Player("player2")
+        self.player1 = Player("player1", 100)
+        self.player2 = Player("player2", 100)
 
         self.table = Table(6, 1, 2, [50, 100])
 
@@ -65,6 +65,28 @@ class TestTable(unittest.TestCase):
         self.assertTrue(self.player1.table == None)
         self.assertEqual(self.player1.stack, 0)
 
+    def test_no_change_to_occupied_seat(self):
+        """ Can we prevent a player from sitting in an occupied seat? """
+        self.table.join(1, self.player1, 100)
+        self.table.join(2, self.player2, 100)
+        with self.assertRaises(Exception) as context:
+            self.table.change_seat(self.player1, 2)
+        self.assertIn("This seat is occupied!!", str(context.exception))
+
+    def test_change_seat_range(self):
+        """ Does the seat in question exist? """
+        self.table.join(1, self.player1, 100)
+        self.table.join(2, self.player2, 100)
+        with self.assertRaises(Exception) as context:
+            self.table.change_seat(self.player1, 13)
+        self.assertIn("This seat doesn't exist!!", str(context.exception))
+
+    def test_change_seat(self):
+        """ Can a player change to an open seat? """
+        self.table.join(1, self.player1, 100)
+        self.table.join(2, self.player2, 100)
+        self.table.change_seat(self.player1, 3)
+        self.assertEqual(self.player1, self.table.seats[3])
 
 if __name__ == '__main__':
     unittest.main()
