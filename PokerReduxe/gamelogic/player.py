@@ -22,11 +22,11 @@ class Player(object):
             @method {} fold Removes player from all pot objects
 
      """
-    def __init__(self, name):
+    def __init__(self, name, stack):
         self.name = name
         self.hole_cards = []
         self.hand = []
-        self.stack = 0
+        self.stack = stack
         self.active = True
         self.table = None
         self.equity = 0
@@ -34,3 +34,12 @@ class Player(object):
         self.action = False
         self.missed_sb = False
         self.missed_bb = False
+
+    def bet(self, amount):
+        """When a player action is set to true, bet is the method by which
+        a player bets calls or checks appropriately."""
+        if amount < 0:
+            raise Exception("Bets can not be negative")
+
+        self.stack -= amount
+        self.equity += amount
