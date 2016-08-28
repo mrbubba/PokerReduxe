@@ -1,4 +1,6 @@
 from app import action_time
+
+
 class Player(object):
     """
     Player object to be assoc with table seats dictionary
