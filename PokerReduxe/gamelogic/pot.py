@@ -1,4 +1,4 @@
-class Pot():
+class Pot(object):
     """
     Pot object which contains initial pot, and side pots for a betting round.
     At end of betting round side pots get created.

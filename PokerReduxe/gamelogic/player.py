@@ -50,7 +50,7 @@ class Player(object):
     def bet(self, amount):
         """When a player action is set to true, bet is the method by which
         a player bets calls or checks appropriately."""
-        if action:
+        if self.action:
             # Do not let people bet negative
             if amount < 0:
                 raise Exception("Bets can not be negative")
@@ -63,7 +63,7 @@ class Player(object):
                 raise Exception("Must match the current bet")
 
             # Check that bet/raise is at least the minimum
-            elif amount > self.table.current_bet and amount < (self.table.current_bet + self.table.bet_increment):
+            elif self.table.current_bet < amount < self.table.current_bet + self.table.bet_increment:
                 raise Exception("Minimum raise is {}".format(self.table.current_bet + self.table.bet_increment))
 
             # Do not let players bet more than stack
@@ -84,7 +84,7 @@ class Player(object):
 
     def fold(self):
         """ Fold player and remove from all pots """
-        if action:
+        if self.action:
             for pot in self.table.pots:
                 pot.players.remove(self)
 
