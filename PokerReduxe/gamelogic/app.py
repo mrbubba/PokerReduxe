@@ -340,6 +340,7 @@ def set_player_table_attributes(table):
     table.community_cards = []
 
     for player in table.player_order:
+        player.hand = []
         player.hole_cards = []
         player.acted = False
 

@@ -1,3 +1,4 @@
+chromedriver==2.21.1
 Django==1.9.8
-wheel==0.24.0
+djangorestframework==3.4.6
 selenium==2.53.6
