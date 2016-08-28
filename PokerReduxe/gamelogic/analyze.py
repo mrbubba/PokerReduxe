@@ -2,14 +2,16 @@ def setup(table):
     """get the players in the pot and their hands"""
     pot = table.pots.pop()
     for player in pot.players:
-        player.hole_cards += table.community_cards
+        if not player.hand:
+            player.hole_cards += table.community_cards
     return pot
 
 
 def order(pot):
     """ order players hands in descending order """
     for player in pot.players:
-        player.hole_cards.sort(key=lambda x: x.value, reverse=True)
+        if not player.hand:
+            player.hole_cards.sort(key=lambda x: x.value, reverse=True)
     return pot
 
 

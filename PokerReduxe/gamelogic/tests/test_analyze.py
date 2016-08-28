@@ -11,15 +11,15 @@ from table import Table
 class TestAnalyze(unittest.TestCase):
     def setUp(self):
 
-        self.player1 = Player("player1")
-        self.player2 = Player("player2")
-        self.player3 = Player("player3")
-        self.player4 = Player("player4")
-        self.player5 = Player("player5")
-        self.player6 = Player("player6")
-        self.player7 = Player("player7")
-        self.player8 = Player("player8")
-        self.player9 = Player("player9")
+        self.player1 = Player("player1", 100)
+        self.player2 = Player("player2", 100)
+        self.player3 = Player("player3", 100)
+        self.player4 = Player("player4", 100)
+        self.player5 = Player("player5", 100)
+        self.player6 = Player("player6", 100)
+        self.player7 = Player("player7", 100)
+        self.player8 = Player("player8", 100)
+        self.player9 = Player("player9", 100)
 
         self.table = Table(9, 1, 2, [50, 100])
 

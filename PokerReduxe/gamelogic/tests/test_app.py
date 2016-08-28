@@ -8,12 +8,12 @@ from table import Table
 
 class TestApp(unittest.TestCase):
     def setUp(self):
-        self.player1 = Player("player1")
-        self.player2 = Player("player2")
-        self.player3 = Player("player3")
-        self.player4 = Player("player4")
-        self.player5 = Player("player5")
-        self.player6 = Player("player6")
+        self.player1 = Player("player1", 100)
+        self.player2 = Player("player2", 100)
+        self.player3 = Player("player3", 100)
+        self.player4 = Player("player4", 100)
+        self.player5 = Player("player5", 100)
+        self.player6 = Player("player6", 100)
 
         self.table = Table(6, 1, 2, [50, 100])
 
@@ -228,21 +228,18 @@ class TestApp(unittest.TestCase):
         self.player3.equity = 30
         self.player4.stack = 0
         self.player4.equity = 40
-        self.player5.stack = 0
+        self.player5.stack = 100
         self.player5.equity = 50
-        self.player6.stack = 0
-        self.player6.equity = 60
+        self.player6.stack = 100
+        self.player6.equity = 50
 
         app.create_deck(self.table)
 
-        self.table.pots[-1].side_pots = [10, 40, 50, 20, 30, 60]
+        self.table.pots[-1].side_pots = [10, 40, 20, 30]
         self.table.pots[-1].amount = 1000
         app.evaluate_pot(self.table)
-
-        self.assertEqual(6, len(self.table.pots[-1].players))
-        self.assertEqual(1060, self.table.pots[-1].amount)
-        self.assertEqual(5, len(self.table.pots))
-        self.assertEqual(5, len(self.table.community_cards))
+        self.assertEqual(2, len(self.table.pots[-1].players))
+        self.assertEqual(1060, self.table.pots[-2].amount)
 
 
 if __name__ == '__main__':

@@ -85,8 +85,9 @@ class Player(object):
     def fold(self):
         """ Fold player and remove from all pots """
         if self.action:
+            self.action = False
+            self._call_action()
+
             for pot in self.table.pots:
                 pot.players.remove(self)
 
-            self.action = False
-            self._call_action()

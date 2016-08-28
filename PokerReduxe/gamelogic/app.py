@@ -3,7 +3,6 @@ import random
 from analyze import analyze
 from pot import Pot
 from card import Card
-from table import Table
 
 
 def get_active_players(table):
@@ -410,7 +409,8 @@ def action_time(table, inc=0):
 
 
 def evaluate_pot(table):
-    """ Evaluates pot on table and creates side pots if neccessary """
+    # Todo:  Need more complete unit test coverage of this function
+    """ Evaluates pot on table and creates side pots if necessary """
     pot = table.pots[-1]
     if pot.side_pots:
         # import pdb
