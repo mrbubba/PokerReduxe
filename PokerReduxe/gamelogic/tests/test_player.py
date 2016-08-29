@@ -12,7 +12,7 @@ class TestPlayer(unittest.TestCase):
         self.player = Player("player1", 100)
         self.player2 = Player("player2", 100)
         self.player.action = True
-        self.table = Table(6, 1, 2, [50, 100])
+        self.table = Table("Table", 6, 1, 2, [50, 100])
         self.table.join(1, self.player, 100)
         self.table.join(2, self.player2, 100)
         pot1 = Pot([self.player, self.player2], 100)

@@ -11,7 +11,7 @@ class TestTable(unittest.TestCase):
         self.player1 = Player("player1", 100)
         self.player2 = Player("player2", 100)
 
-        self.table = Table(6, 1, 2, [50, 100])
+        self.table = Table("Table", 6, 1, 2, [50, 100])
 
     def test_seats_dict(self):
         """ Is seats dict properly created on instantiation """
@@ -20,7 +20,7 @@ class TestTable(unittest.TestCase):
     def test_seats_dict_exception(self):
         """ Do we throw an error when too many seats """
         with self.assertRaises(ValueError):
-            Table(12, 1, 2, [50, 10])
+            Table("Table", 12, 1, 2, [50, 10])
 
     def test_join_table(self):
         """Can a player join our table??"""

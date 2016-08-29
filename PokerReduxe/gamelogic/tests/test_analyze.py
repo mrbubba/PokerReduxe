@@ -21,7 +21,7 @@ class TestAnalyze(unittest.TestCase):
         self.player8 = Player("player8", 100)
         self.player9 = Player("player9", 100)
 
-        self.table = Table(9, 1, 2, [50, 100])
+        self.table = Table("Table", 9, 1, 2, [50, 100])
 
         self.table.join(1, self.player1, 100)
         self.table.join(2, self.player2, 100)
