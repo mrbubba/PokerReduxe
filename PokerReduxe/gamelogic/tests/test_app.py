@@ -15,7 +15,7 @@ class TestApp(unittest.TestCase):
         self.player5 = Player("player5", 100)
         self.player6 = Player("player6", 100)
 
-        self.table = Table(6, 1, 2, [50, 100])
+        self.table = Table("Table", 6, 1, 2, [50, 100])
 
         self.table.join(1, self.player1, 100)
         self.table.join(2, self.player2, 100)

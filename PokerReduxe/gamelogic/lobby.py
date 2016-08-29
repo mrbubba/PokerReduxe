@@ -15,6 +15,6 @@ class Lobby(object):
     def __init__(self):
         self.tables = []
 
-    def create_table(self, seats, sb_amount, bb_amount, buy_in, ante=0):
-        table = Table(self, seats, sb_amount, bb_amount, buy_in, ante)
+    def create_table(self, name, seats, sb_amount, bb_amount, buy_in, ante=0):
+        table = Table(self, name, seats, sb_amount, bb_amount, buy_in, ante)
         self.tables.append(table)

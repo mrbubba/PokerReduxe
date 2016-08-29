@@ -4,6 +4,7 @@ class Table(object):
 
     ATTRIBUTES:
 
+        @property {str} table_name A name of table
         @property {dict} seats A dict of Player obj representing seat order
         @property {int} sb_amount The small blind amount
         @property {int} bb_amount The big blind amount
@@ -27,7 +28,8 @@ class Table(object):
 
     """
 
-    def __init__(self, seats, sb_amount, bb_amount, buy_in, ante=0):
+    def __init__(self, name, seats, sb_amount, bb_amount, buy_in, ante=0):
+        self.table_name = name
         self.seats = {}
         # Build seats dictionary
         self._build_seats(seats)
