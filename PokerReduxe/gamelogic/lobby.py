@@ -18,3 +18,4 @@ class Lobby(object):
     def create_table(self, name, seats, sb_amount, bb_amount, buy_in, ante=0):
         table = Table(self, name, seats, sb_amount, bb_amount, buy_in, ante)
         self.tables.append(table)
+        # TODO: Raise exception if table name is not unique
