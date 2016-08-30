@@ -19,3 +19,4 @@ class Lobby(object):
         table = Table(self, name, seats, sb_amount, bb_amount, buy_in, ante)
         self.tables.append(table)
         # TODO: Raise exception if table name is not unique
+LobbyInstance = Lobby()

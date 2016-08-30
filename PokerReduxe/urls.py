@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from .views import LobbyView
 
 urlpatterns = [
+    url(r'^lobby/', LobbyView.as_view(), name='lobby'),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('accounts.urls')),
-    url(r'^api/', include('poker_api.urls')),
+    # url(r'^api/', include('poker_api.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

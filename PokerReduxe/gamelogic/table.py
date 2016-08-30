@@ -62,7 +62,7 @@ class Table(object):
         if player in self.seats.values():
             raise ValueError("You can't join the same game twice")
 
-        # set buyin range
+        # set buy in range
         min_buy = self.buy_in[0]
         max_buy = self.buy_in[1] + 1
 
@@ -71,7 +71,7 @@ class Table(object):
             raise ValueError('Buy in must be between {} and {}.'.format(min_buy, self.buy_in[1]))
 
         # ensure seat is empty
-        if self.seats[key] == None:
+        if not self.seats[key]:
             self.seats[key] = player
             self.seats[key].stack = stack
             self.seats[key].table = self
