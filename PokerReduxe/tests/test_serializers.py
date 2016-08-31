@@ -1,8 +1,11 @@
 import unittest
+import json
 
-from PokerReduxe.gamelogic.player import Player
-from PokerReduxe.gamelogic.table import Table
-from PokerReduxe.gamelogic.pot import Pot
+from serializers import TableEncoder
+
+from gamelogic.player import Player
+from gamelogic.table import Table
+from gamelogic.pot import Pot
 
 
 class TestPlayer(unittest.TestCase):
@@ -18,6 +21,10 @@ class TestPlayer(unittest.TestCase):
         pot2 = Pot([self.player, self.player2], 100)
         self.table.pots = [pot1, pot2]
 
+    def test_class_to_json(self):
+        """ Can we convert our Python Class to json string? """
+        result = json.dumps(self.table, cls=TableEncoder,  check_circular=False)
+        self.assertTrue(type(result), str())
 
 if __name__ == '__main__':
     unittest.main()

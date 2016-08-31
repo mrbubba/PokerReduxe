@@ -18,5 +18,6 @@ def socket_server():
         data = repr(data)
         if "GETLOBBY" in data:
             payload = LobbyInstance.get_lobby()
+            # Run logic
             conn.sendall(payload)
     conn.close()

@@ -74,7 +74,6 @@ class Table(object):
         if not self.seats[key]:
             self.seats[key] = player
             self.seats[key].stack = stack
-            self.seats[key].table = self
         else:
             raise ValueError("Don't be rude, this seat is taken.")
 
@@ -85,7 +84,6 @@ class Table(object):
             player._call_action()
         while player.equity:
             player.active = False
-        player.table = None
         player.stack = 0
         for k, v in self.seats.items():
             if v == player:

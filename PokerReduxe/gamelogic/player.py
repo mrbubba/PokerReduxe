@@ -1,4 +1,4 @@
-from app import action_time
+from .app import action_time
 
 
 class Player(object):
@@ -90,4 +90,3 @@ class Player(object):
 
             for pot in self.table.pots:
                 pot.players.remove(self)
-

@@ -1,8 +1,8 @@
 import random
 
-from analyze import analyze
-from pot import Pot
-from card import Card
+from .analyze import analyze
+from .pot import Pot
+from .card import Card
 
 
 def get_active_players(table):
