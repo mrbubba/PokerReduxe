@@ -15,6 +15,12 @@ class Lobby(object):
     def __init__(self):
         self.tables = []
 
+    def get_lobby(self):
+        payload = {}
+        for table in self.tables:
+            payload[table.name] = [table.seats, table.sb_amount, table.bb_amount, buy_in, ante]
+        return payload
+
     def create_table(self, name, seats, sb_amount, bb_amount, buy_in, ante=0):
         table = Table(self, name, seats, sb_amount, bb_amount, buy_in, ante)
         self.tables.append(table)
