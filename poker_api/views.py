@@ -21,4 +21,3 @@ class LobbyView(APIView):
         data = game_socket("GETLOBBY")
         #  TODO:  convert data in Json and return it to the client via websocket
         return Response(data)
-
