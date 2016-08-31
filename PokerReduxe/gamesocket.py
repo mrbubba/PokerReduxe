@@ -1,7 +1,7 @@
 import socket
 
 
-from PokerReduxe.gamelogic.lobby import LobbyInstance
+from gamelogic.lobby import LobbyInstance
 
 
 def socket_server():
@@ -11,7 +11,6 @@ def socket_server():
     s.bind(server_address)
     s.listen(5)
     conn, addr = s.accept()
-
     while True:
         data = conn.recv(1024)
         if not data:
@@ -20,5 +19,4 @@ def socket_server():
         if "GETLOBBY" in data:
             payload = LobbyInstance.get_lobby()
             conn.sendall(payload)
-
     conn.close()
