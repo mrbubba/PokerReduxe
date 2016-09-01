@@ -66,6 +66,4 @@ class Player(object):
     def fold(self):
         """ Set fold attribute to True and action to False """
         self.fold = True
-        self.action = False
-
 

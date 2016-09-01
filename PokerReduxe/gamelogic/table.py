@@ -79,7 +79,11 @@ class Table(object):
 
     # @param player The player object to remove from seats
     def quit(self, player):
-        player.table = None
+        if player.action:
+            player.action = False
+            player._call_action()
+        while player.equity:
+            player.active = False
         player.stack = 0
         for k, v in self.seats.items():
             if v == player:
