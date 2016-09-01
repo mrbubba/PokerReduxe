@@ -31,21 +31,14 @@ class Player(object):
         self.hand = []
         self.stack = stack
         self.active = True
-        self.table = None
         self.equity = 0
         self.acted = False
+        self.fold = False
         self.action = False
         self.missed_sb = False
         self.missed_bb = False
-
-    def _call_action(self):
-        """ After player has acted, player needs to call action on the next
-        player """
-        my_ind = self.table.pots[-1].players.index(self)
-        ind = my_ind + 1
-        if ind == len(self.table.pots[-1].players):
-            ind = 0
-        action_time(self.table, ind)
+        self.current_bet = 0
+        self.bet_increment = 0
 
     def bet(self, amount):
         """When a player action is set to true, bet is the method by which
@@ -55,24 +48,18 @@ class Player(object):
             if amount < 0:
                 raise Exception("Bets can not be negative")
 
-            # Check for all in bet
-            elif amount == self.stack:
-                self.table.pots[-1].side_pots.append(amount)
-
-            elif amount < self.table.current_bet:
+            elif amount < self.current_bet and self.stack > 0:
                 raise Exception("Must match the current bet")
 
             # Check that bet/raise is at least the minimum
-            elif self.table.current_bet < amount < self.table.current_bet + self.table.bet_increment:
-                raise Exception("Minimum raise is {}".format(self.table.current_bet + self.table.bet_increment))
+            elif self.current_bet < amount < self.current_bet + self.bet_increment and self.stack > 0:
+                raise Exception("Minimum raise is {}".format(self.current_bet + self.bet_increment))
 
             # Do not let players bet more than stack
             if amount > self.stack:
                 raise Exception("You can only bet what you have on the table!!")
 
-            # Set bet increment correctly
-            if amount > (self.table.current_bet + self.table.bet_increment):
-                self.table.bet_increment = amount - self.table.current_bet
+
 
             # Take bet from stack and move to equity
             self.stack -= amount
@@ -83,11 +70,8 @@ class Player(object):
             self._call_action()
 
     def fold(self):
-        """ Fold player and remove from all pots """
-        if self.action:
-            self.action = False
-            self._call_action()
+        """ Set fold attribute to True and action to False """
+        self.fold = True
+        self.action = False
 
-            for pot in self.table.pots:
-                pot.players.remove(self)
 

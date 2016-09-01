@@ -388,23 +388,51 @@ def deal_hole(table):
     action_time(table, inc)
 
 
+def _action_engine(table, inc):
+    pot = table.pots[-1]
+    pot.players[inc].current_bet = table.current_bet
+    pot.players[inc].bet_increment = table.bet_increment
+    pot.players[inc].action = True
+    while pot.players[inc].action:
+        # Todo:  We need a timeout method here
+        pass
+    if pot.players[inc].fold:
+        pot.players[inc].fold = False
+        next_inc = inc + 1
+        if next_inc > len(pot.players):
+            next_inc = 0
+        next_player = pot.players[next_inc]
+        pot.players.remove(inc)
+        inc = pot.players.index(next_player)
+        return action_time(table, inc)
+    if not pot.players[inc].stack:
+        pot.side_pots.append(pot.players[inc].equity)
+    if pot.players[inc].equity > table.current_bet:
+        table.current_bet = pot.players[inc].equity
+    if pot.players[inc].equity > table.current_bet + table.bet_increment:
+        table.bet_increment = pot.players[inc].equity - table.current_bet
+    inc += 1
+    if inc == len(pot.players):
+        inc = 0
+    action_time(table, inc)
+
+
 def action_time(table, inc=0):
     pot = table.pots[-1]
-
     # list comprehension to check for all in players, break if so
     current_players = [x for x in pot.players if x.stack > 0]
     if not current_players:
         evaluate_pot(table)
-
     elif not pot.players[inc].acted and pot.players[inc].stack > 0:
-        pot.players[inc].action = True
+        _action_engine(table, inc)
     elif table.current_bet > pot.players[inc].equity and pot.players[inc].stack > 0:
-        pot.players[inc].action = True
+        _action_engine(table, inc)
     elif pot.players[inc].stack == 0:
-        x = inc + 1
-        if x == len(pot.players):
-            x = 0
-        action_time(table, x)
+        inc += 1
+        if inc == len(pot.players):
+            inc = 0
+        action_time(table, inc)
+
     else:
         evaluate_pot(table)
 
