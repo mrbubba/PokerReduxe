@@ -1,6 +1,3 @@
-from app import action_time
-
-
 class Player(object):
     """
     Player object to be assoc with table seats dictionary
@@ -59,15 +56,12 @@ class Player(object):
             if amount > self.stack:
                 raise Exception("You can only bet what you have on the table!!")
 
-
-
             # Take bet from stack and move to equity
             self.stack -= amount
             self.equity += amount
 
             # Set players action to False
             self.action = False
-            self._call_action()
 
     def fold(self):
         """ Set fold attribute to True and action to False """
