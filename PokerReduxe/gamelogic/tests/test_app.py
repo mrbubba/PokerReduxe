@@ -201,6 +201,8 @@ class TestApp(unittest.TestCase):
     def test_action_time_first_to_act(self):
         """ If player has yet to play, can we set its action to True? """
         app.action_time(self.table)
+        for player in self.table.player_order:
+            player.action = False
         self.assertTrue(self.player1.action)
 
     def test_action_time_second_pass(self):

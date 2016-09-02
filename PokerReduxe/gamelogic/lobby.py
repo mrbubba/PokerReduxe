@@ -25,4 +25,9 @@ class Lobby(object):
         table = Table(self, name, seats, sb_amount, bb_amount, buy_in, ante)
         self.tables.append(table)
         # TODO: Raise exception if table name is not unique
+
+    def get_table(self, table_name):
+        table = [table for table in self.tables if table.name == table_name]
+        return table
+
 LobbyInstance = Lobby()

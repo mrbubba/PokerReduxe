@@ -39,12 +39,7 @@ class TestTable(unittest.TestCase):
         self.table.join(1, self.player1, 100)
         with self.assertRaises(ValueError):
             self.table.join(2, self.player1, 100)
-        self.assertTrue(self.table.seats[2] == None)
-
-    def test_player_table_attribute_set(self):
-        """can we set player.table to this table?"""
-        self.table.join(1, self.player1, 100)
-        self.assertTrue(self.player1.table == self.table)
+        self.assertFalse(self.table.seats[2])
 
     def test_set_player_buyin(self):
         """can set players stack with buy in"""
@@ -55,14 +50,13 @@ class TestTable(unittest.TestCase):
         """Can we restrict players to the table buyin range?"""
         with self.assertRaises(ValueError):
             self.table.join(1, self.player1, 110)
-        self.assertTrue(self.table.seats[1] == None)
+        self.assertFalse(self.table.seats[1])
 
     def test_quit(self):
         """ Can a player quit the game? """
         self.table.join(1, self.player1, 100)
         self.table.quit(self.player1)
-        self.assertTrue(self.table.seats[1] == None)
-        self.assertTrue(self.player1.table == None)
+        self.assertFalse(self.table.seats[1])
         self.assertEqual(self.player1.stack, 0)
 
     def test_no_change_to_occupied_seat(self):

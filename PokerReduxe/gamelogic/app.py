@@ -1,8 +1,9 @@
 import random
 
-from .analyze import analyze
-from .pot import Pot
-from .card import Card
+from analyze import analyze
+from pot import Pot
+from card import Card
+from lobby import LobbyInstance
 
 
 def get_active_players(table):
@@ -390,51 +391,46 @@ def deal_hole(table):
 
 def _action_engine(table, inc):
     pot = table.pots[-1]
-    pot.players[inc].current_bet = table.current_bet
-    pot.players[inc].bet_increment = table.bet_increment
-    pot.players[inc].action = True
-    while pot.players[inc].action:
-        # Todo:  We need a timeout method here
-        pass
-    if pot.players[inc].fold:
-        pot.players[inc].fold = False
-        next_inc = inc + 1
-        if next_inc > len(pot.players):
-            next_inc = 0
-        next_player = pot.players[next_inc]
-        pot.players.remove(inc)
-        inc = pot.players.index(next_player)
-        return action_time(table, inc)
-    if not pot.players[inc].stack:
-        pot.side_pots.append(pot.players[inc].equity)
-    if pot.players[inc].equity > table.current_bet:
-        table.current_bet = pot.players[inc].equity
-    if pot.players[inc].equity > table.current_bet + table.bet_increment:
-        table.bet_increment = pot.players[inc].equity - table.current_bet
-    inc += 1
-    if inc == len(pot.players):
-        inc = 0
-    action_time(table, inc)
-
-
-def action_time(table, inc=0):
-    pot = table.pots[-1]
-    # list comprehension to check for all in players, break if so
-    current_players = [x for x in pot.players if x.stack > 0]
-    if not current_players:
-        evaluate_pot(table)
-    elif not pot.players[inc].acted and pot.players[inc].stack > 0:
-        _action_engine(table, inc)
-    elif table.current_bet > pot.players[inc].equity and pot.players[inc].stack > 0:
-        _action_engine(table, inc)
-    elif pot.players[inc].stack == 0:
+    if not pot.players[inc].active or not pot.players.stack:
         inc += 1
         if inc == len(pot.players):
             inc = 0
-        action_time(table, inc)
-
-    else:
+        _action_engine(table, inc)
+    elif pot.players[inc].acted and pot.players[inc].equity == table.current_bet:
         evaluate_pot(table)
+    else:
+        pot.players[inc].current_bet = table.current_bet
+        pot.players[inc].bet_increment = table.bet_increment
+        pot.players[inc].action = True
+
+
+def action_time(player, table_name):
+    table = LobbyInstance.get_table(table_name)
+    pot = table.pots[-1]
+    inc = pot.players.index(player)
+    # list comprehension to check for all in players, break if so
+    current_players = [x for x in pot.players if x.stack > 0]
+    if len(current_players) < 2:
+        return evaluate_pot(table)
+    inc += 1
+    if inc == len(pot.players):
+        inc = 0
+    if player.fold:
+        next_player = pot.players[inc]
+        for pot in table.pots:
+            pot.players.remove(player)
+            inc = pot.players.index(next_player)
+            return _action_engine(table, inc)
+    if player.equity > table.current_bet + table.bet_increment:
+        table.bet_increment = player.equity - table.current_bet
+    if player.equity > table.current_bet:
+        table.current_bet = player.equity
+    if player.stack == 0:
+        pot.side_pots.append(player.equity)
+    if pot.players[inc].fold:
+        player = pot.players[inc]
+        return action_time(player, table.table_name)
+    return _action_engine(table, inc)
 
 
 def evaluate_pot(table):
@@ -442,8 +438,6 @@ def evaluate_pot(table):
     """ Evaluates pot on table and creates side pots if necessary """
     pot = table.pots[-1]
     if pot.side_pots:
-        # import pdb
-        # pdb.set_trace()
         pot.side_pots = sorted(pot.side_pots)
         while pot.side_pots:
             amount = pot.side_pots.pop(0)

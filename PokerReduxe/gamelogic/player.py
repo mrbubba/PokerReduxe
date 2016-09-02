@@ -1,4 +1,7 @@
+from app import action_time
+
 class Player(object):
+
     """
     Player object to be assoc with table seats dictionary
 
@@ -36,6 +39,7 @@ class Player(object):
         self.missed_bb = False
         self.current_bet = 0
         self.bet_increment = 0
+        self.table_name = None
 
     def bet(self, amount):
         """When a player action is set to true, bet is the method by which
@@ -59,11 +63,15 @@ class Player(object):
             # Take bet from stack and move to equity
             self.stack -= amount
             self.equity += amount
+            self.acted = True
 
             # Set players action to False
             self.action = False
+            action_time(self, self.table_name)
 
     def fold(self):
         """ Set fold attribute to True and action to False """
         self.fold = True
+        self.action = False
+        action_time(self, self.table_name)
 

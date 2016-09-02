@@ -66,6 +66,7 @@ class Table(object):
         min_buy = self.buy_in[0]
         max_buy = self.buy_in[1] + 1
 
+
         # ensure proper buyin
         if stack not in range(min_buy, max_buy):
             raise ValueError('Buy in must be between {} and {}.'.format(min_buy, self.buy_in[1]))
@@ -74,6 +75,7 @@ class Table(object):
         if not self.seats[key]:
             self.seats[key] = player
             self.seats[key].stack = stack
+            self.seats[key].table_name = self.table_name
         else:
             raise ValueError("Don't be rude, this seat is taken.")
 
