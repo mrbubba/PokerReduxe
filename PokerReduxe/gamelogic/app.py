@@ -3,7 +3,8 @@ import random
 from analyze import analyze
 from pot import Pot
 from card import Card
-from lobby import LobbyInstance
+# from lobby import Lobby
+
 
 
 def get_active_players(table):
@@ -344,6 +345,7 @@ def set_player_table_attributes(table):
         player.hand = []
         player.hole_cards = []
         player.acted = False
+        player.folded = False
 
 
 def create_deck(table):
@@ -385,13 +387,16 @@ def deal_hole(table):
     # Set Inc for head to head
     if len(table.player_order) == 2:
         inc = 1
+    player = table.pots[-1].players[inc]
     table.current_bet = table.bb_amount
-    action_time(table, inc)
+    action_time(player, table)
 
 
 def _action_engine(table, inc):
     pot = table.pots[-1]
-    if not pot.players[inc].active or not pot.players.stack:
+    if pot.players[inc].folded:
+        return action_time(pot.players[inc], table)
+    if pot.players[inc].stack == 0:
         inc += 1
         if inc == len(pot.players):
             inc = 0
@@ -399,13 +404,10 @@ def _action_engine(table, inc):
     elif pot.players[inc].acted and pot.players[inc].equity == table.current_bet:
         evaluate_pot(table)
     else:
-        pot.players[inc].current_bet = table.current_bet
-        pot.players[inc].bet_increment = table.bet_increment
         pot.players[inc].action = True
 
 
-def action_time(player, table_name):
-    table = LobbyInstance.get_table(table_name)
+def action_time(player, table):
     pot = table.pots[-1]
     inc = pot.players.index(player)
     # list comprehension to check for all in players, break if so
@@ -415,21 +417,26 @@ def action_time(player, table_name):
     inc += 1
     if inc == len(pot.players):
         inc = 0
-    if player.fold:
+    if player.folded:
         next_player = pot.players[inc]
+        player.folded = False
         for pot in table.pots:
             pot.players.remove(player)
-            inc = pot.players.index(next_player)
-            return _action_engine(table, inc)
+        inc = pot.players.index(next_player)
+        return _action_engine(table, inc)
     if player.equity > table.current_bet + table.bet_increment:
         table.bet_increment = player.equity - table.current_bet
     if player.equity > table.current_bet:
         table.current_bet = player.equity
     if player.stack == 0:
-        pot.side_pots.append(player.equity)
-    if pot.players[inc].fold:
+        if player.equity not in pot.side_pots:
+            pot.side_pots.append(player.equity)
+    if pot.players[inc].folded:
         player = pot.players[inc]
-        return action_time(player, table.table_name)
+        return action_time(player, table)
+    if pot.players[inc].stack == 0:
+        player = pot.players[inc]
+        return action_time(player, table)
     return _action_engine(table, inc)
 
 
@@ -496,4 +503,4 @@ def deal(table):
             table.community_cards.append(table.deck.pop(0))
     else:
         table.community_cards.append(table.deck.pop(0))
-    action_time(table)
+    action_time(table.pots[-1].players[-1], table)

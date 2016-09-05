@@ -1,7 +1,7 @@
 from app import action_time
 
-class Player(object):
 
+class Player(object):
     """
     Player object to be assoc with table seats dictionary
 
@@ -33,28 +33,29 @@ class Player(object):
         self.active = True
         self.equity = 0
         self.acted = False
-        self.fold = False
+        self.folded = False
         self.action = False
         self.missed_sb = False
         self.missed_bb = False
-        self.current_bet = 0
-        self.bet_increment = 0
-        self.table_name = None
+        self.table = None
 
     def bet(self, amount):
         """When a player action is set to true, bet is the method by which
         a player bets calls or checks appropriately."""
         if self.action:
+            #  A player can always go all in no matter the current_bet
+            if amount == self.stack:
+                pass
             # Do not let people bet negative
-            if amount < 0:
+            elif amount < 0:
                 raise Exception("Bets can not be negative")
 
-            elif amount < self.current_bet and self.stack > 0:
+            elif amount < self.table.current_bet and self.stack > 0:
                 raise Exception("Must match the current bet")
 
             # Check that bet/raise is at least the minimum
-            elif self.current_bet < amount < self.current_bet + self.bet_increment and self.stack > 0:
-                raise Exception("Minimum raise is {}".format(self.current_bet + self.bet_increment))
+            elif self.table.current_bet < amount < self.table.current_bet + self.table.bet_increment:
+                raise Exception("Minimum raise is {}".format(self.table.current_bet + self.table.bet_increment))
 
             # Do not let players bet more than stack
             if amount > self.stack:
@@ -67,11 +68,12 @@ class Player(object):
 
             # Set players action to False
             self.action = False
-            action_time(self, self.table_name)
+            action_time(self, self.table)
 
     def fold(self):
         """ Set fold attribute to True and action to False """
-        self.fold = True
-        self.action = False
-        action_time(self, self.table_name)
+        self.folded = True
+        if self.action:
+            self.action = False
+            action_time(self, self.table)
 

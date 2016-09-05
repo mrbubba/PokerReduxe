@@ -75,7 +75,7 @@ class Table(object):
         if not self.seats[key]:
             self.seats[key] = player
             self.seats[key].stack = stack
-            self.seats[key].table_name = self.table_name
+            player.table = self
         else:
             raise ValueError("Don't be rude, this seat is taken.")
 
@@ -83,7 +83,7 @@ class Table(object):
     def quit(self, player):
         if player.action:
             player.action = False
-            player._call_action()
+            player.fold()
         while player.equity:
             player.active = False
         player.stack = 0
@@ -100,5 +100,8 @@ class Table(object):
         if self.seats[ind] is not None:
             raise Exception("This seat is occupied!!")
 
+        stack_save = player.stack
         self.quit(player)
         self.seats[ind] = player
+        player.stack = stack_save
+        player.active = True

@@ -200,9 +200,7 @@ class TestApp(unittest.TestCase):
 
     def test_action_time_first_to_act(self):
         """ If player has yet to play, can we set its action to True? """
-        app.action_time(self.table)
-        for player in self.table.player_order:
-            player.action = False
+        app.action_time(self.player6, self.table)
         self.assertTrue(self.player1.action)
 
     def test_action_time_second_pass(self):
@@ -210,13 +208,13 @@ class TestApp(unittest.TestCase):
         self.table.current_bet = 20
         self.player1.equity = 10
         self.player1.acted = True
-        app.action_time(self.table)
+        app.action_time(self.player6, self.table)
         self.assertTrue(self.player1.action)
 
     def test_action_time_skip_all_in_player(self):
         """ Can we skip an all in player? """
         self.player1.stack = 0
-        app.action_time(self.table)
+        app.action_time(self.player6, self.table)
         self.assertFalse(self.player1.action)
         self.assertTrue(self.player2.action)
 

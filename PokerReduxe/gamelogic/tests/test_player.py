@@ -1,5 +1,6 @@
 import unittest
 
+
 from player import Player
 from table import Table
 from pot import Pot
@@ -11,12 +12,14 @@ class TestPlayer(unittest.TestCase):
     def setUp(self):
         self.player = Player("player1", 100)
         self.player2 = Player("player2", 100)
+        self.player3 = Player("player3", 100)
         self.player.action = True
         self.table = Table("Table", 6, 1, 2, [50, 100])
         self.table.join(1, self.player, 100)
         self.table.join(2, self.player2, 100)
-        pot1 = Pot([self.player, self.player2], 100)
-        pot2 = Pot([self.player, self.player2], 100)
+        self.table.join(3, self.player3, 100)
+        pot1 = Pot([self.player, self.player2, self.player3], 100)
+        pot2 = Pot([self.player, self.player2, self.player3], 100)
         self.table.pots = [pot1, pot2]
 
     def test_bet(self):
@@ -64,13 +67,9 @@ class TestPlayer(unittest.TestCase):
         self.player.bet(50)
         self.assertEqual(self.table.bet_increment, 50)
 
-    def test_call_action(self):
-        """ Can we call action time appropriately """
-        self.player._call_action()
-        self.assertTrue(self.player2.action)
-
     def test_fold(self):
         """ Can we fold a player out? """
+        self.player.action = True
         self.player.fold()
         self.assertNotIn(self.player, self.table.pots[0].players)
         self.assertNotIn(self.player, self.table.pots[1].players)
