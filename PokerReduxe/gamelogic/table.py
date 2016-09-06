@@ -61,13 +61,14 @@ class Table(object):
     # @param stack The players initial buy in
     def join(self, key, player_name, stack):
         # if player is in game already, he cant join
-        if player in self.seats.values():
-            raise ValueError("You can't join the same game twice")
+        number = len(self.seats)
+        for x in range(1, number + 1):
+            if self.seats[x] and player_name == self.seats[x].name:
+                raise ValueError("You can't join the same game twice")
 
         # set buy in range
         min_buy = self.buy_in[0]
         max_buy = self.buy_in[1] + 1
-
 
         # ensure proper buyin
         if stack not in range(min_buy, max_buy):

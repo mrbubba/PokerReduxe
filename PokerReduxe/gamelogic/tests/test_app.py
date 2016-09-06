@@ -1,28 +1,20 @@
 import unittest
 
 import app
-from player import Player
 from pot import Pot
 from table import Table
 
 
 class TestApp(unittest.TestCase):
     def setUp(self):
-        self.player1 = Player("player1", 100)
-        self.player2 = Player("player2", 100)
-        self.player3 = Player("player3", 100)
-        self.player4 = Player("player4", 100)
-        self.player5 = Player("player5", 100)
-        self.player6 = Player("player6", 100)
-
         self.table = Table("Table", 6, 1, 2, [50, 100])
 
-        self.table.join(1, self.player1, 100)
-        self.table.join(2, self.player2, 100)
-        self.table.join(3, self.player3, 100)
-        self.table.join(4, self.player4, 100)
-        self.table.join(5, self.player5, 100)
-        self.table.join(6, self.player6, 100)
+        self.table.join(1, 'player1', 100)
+        self.table.join(2, 'player2', 100)
+        self.table.join(3, 'player3', 100)
+        self.table.join(4, 'player4', 100)
+        self.table.join(5, 'player5', 100)
+        self.table.join(6, 'player6', 100)
 
         # Set player order; happy path
         for k, v in self.table.seats.items():
@@ -35,14 +27,14 @@ class TestApp(unittest.TestCase):
     def test_get_active_players(self):
         """ Can we grab a list of active players? """
         six_players = app.get_active_players(self.table)
-        self.player1.active = False
+        self.table.seats[1].active = False
         five_players = app.get_active_players(self.table)
         self.assertEqual(6, len(six_players))
         self.assertEqual(5, len(five_players))
 
     def test_remove_broke_player(self):
         """ Can we remove players with zero chips left in stack """
-        self.player1.stack = 0
+        self.table.seats[1].stack = 0
         five_players = app.get_active_players(self.table)
         self.assertEqual(5, len(five_players))
 
@@ -66,7 +58,7 @@ class TestApp(unittest.TestCase):
 
     def test_remove_inactive_from_hand(self):
         """ Can we remove an inactive player from a hand """
-        self.player4.active = False
+        self.table.seats[4].active = False
         app.move_button(self.table)
         self.assertEqual(len(self.table.player_order), 5)
 
@@ -77,9 +69,9 @@ class TestApp(unittest.TestCase):
         expected.append(x)
         x = expected.pop(0)
         expected.append(x)
-        self.player4.active = False
+        self.table.seats[4].active = False
         app.move_button(self.table)
-        self.player4.active = True
+        self.table.seats[4].active = True
         app.move_button(self.table)
         self.assertEqual(len(self.table.player_order), 6)
         self.assertEqual(expected, self.table.player_order)
@@ -96,82 +88,82 @@ class TestApp(unittest.TestCase):
 
     def test_set_missed_bb(self):
         """ Can we set missed bb to True """
-        self.player3.active = False
+        self.table.seats[3].active = False
         app.move_button(self.table)
-        self.assertTrue(self.player3.missed_bb)
+        self.assertTrue(self.table.seats[3].missed_bb)
 
     def test_set_missed_sb(self):
         """ Can we set missed sb to True """
-        self.player2.active = False
-        self.player2.acted = True
+        self.table.seats[2].active = False
+        self.table.seats[2].acted = True
         app.move_button(self.table)
-        self.assertTrue(self.player2.missed_sb)
+        self.assertTrue(self.table.seats[2].missed_sb)
 
     def test_remove_missed_blinds_from_button(self):
         """ Can we remove people who owe blinds in the button position? """
-        self.player6.missed_bb = True
-        self.player5.missed_sb = True
+        self.table.seats[6].missed_bb = True
+        self.table.seats[5].missed_sb = True
         app.missed_blind_corner_cases(self.table)
         self.assertEqual(4, len(self.table.player_order))
 
     def test_bought_button(self):
         """ Can we appropriately allow someone to buy the button? """
-        self.player1.missed_bb = True
+        self.table.seats[1].missed_bb = True
         app.missed_blind_corner_cases(self.table)
-        self.assertEqual(3, self.player1.equity)
-        self.assertEqual(0, self.player2.equity)
+        self.assertEqual(3, self.table.seats[1].equity)
+        self.assertEqual(0, self.table.seats[2].equity)
 
     def test_only_one_bought_button(self):
         """ Can we ensure only one bought button? """
-        self.player1.missed_bb = True
-        self.player2.missed_bb = True
+        self.table.seats[1].missed_bb = True
+        self.table.seats[2].missed_bb = True
         app.missed_blind_corner_cases(self.table)
         self.assertEqual(5, len(self.table.player_order))
 
     def test_collect_all_blinds(self):
         """ Can we collect all of the blinds? """
         app.collect_blinds(self.table)
-        self.assertEqual(99, self.player1.stack)
-        self.assertEqual(1, self.player1.equity)
-        self.assertEqual(98, self.player2.stack)
-        self.assertEqual(2, self.player2.equity)
+        self.assertEqual(99, self.table.seats[1].stack)
+        self.assertEqual(1, self.table.seats[1].equity)
+        self.assertEqual(98, self.table.seats[2].stack)
+        self.assertEqual(2, self.table.seats[2].equity)
 
     def test_collect_blinds_head_to_head(self):
         """ Can we set/collect the blinds for head to head appropriately? """
-        self.table.player_order = [self.player1, self.player2]
+        self.table.player_order = [self.table.seats[1], self.table.seats[2]]
         app.collect_blinds(self.table)
-        self.assertEqual(99, self.player2.stack)
-        self.assertEqual(1, self.player2.equity)
-        self.assertEqual(98, self.player1.stack)
-        self.assertEqual(2, self.player1.equity)
+        self.assertEqual(99, self.table.seats[2].stack)
+        self.assertEqual(1, self.table.seats[2].equity)
+        self.assertEqual(98, self.table.seats[1].stack)
+        self.assertEqual(2, self.table.seats[1].equity)
 
     def test_dont_collect_blinds_if_button_has_been_bought(self):
         """ Can we ensure that we dont collect bb if button is bought """
-        self.player1.equity = 3
+        self.table.seats[1].equity = 3
         app.collect_blinds(self.table)
-        self.assertEqual(3, self.player1.equity)
-        self.assertEqual(0, self.player2.equity)
+        self.assertEqual(3, self.table.seats[1].equity)
+        self.assertEqual(0, self.table.seats[2].equity)
 
     def test_collect_missed_blinds(self):
         """ Can we ensure that missed blinds are collected? """
-        self.player3.missed_sb = True
-        self.player3.missed_bb = True
-        self.player4.missed_bb = True
-        self.player5.missed_sb = True
+        self.table.seats[3].missed_sb = True
+        self.table.seats[3].missed_bb = True
+        self.table.seats[4].missed_bb = True
+        self.table.seats[5].missed_sb = True
         app.collect_missed_blinds(self.table)
-        self.assertEqual(3, self.player3.equity)
-        self.assertEqual(98, self.player4.stack)
-        self.assertEqual(False, self.player5.missed_sb)
+        self.assertEqual(3, self.table.seats[3].equity)
+        self.assertEqual(98, self.table.seats[4].stack)
+        self.assertEqual(False, self.table.seats[5].missed_sb)
 
     def test_create_initial_pot(self):
         """ Can we ensure a proper initial pot is created? """
         self.table.pots = []
-        self.player3.equity = 3
-        self.player4.equity = 2
-        self.player5.stack = 10
+        self.table.seats[3].equity = 3
+        self.table.seats[4].equity = 2
+        self.table.seats[5].stack = 10
         self.table.ante = 10
         app.create_initial_pot(self.table)
-        self.assertEqual(12, self.player3.equity)
+        self.assertEqual(12, self.table.seats[3].equity)
         self.assertEqual(61, self.table.pots[0].amount)
         self.assertEqual(10, self.table.pots[0].side_pots[0])
 
@@ -200,45 +192,45 @@ class TestApp(unittest.TestCase):
 
     def test_action_time_first_to_act(self):
         """ If player has yet to play, can we set its action to True? """
-        app.action_time(self.player6, self.table)
-        self.assertTrue(self.player1.action)
+        app.action_time(self.table.seats[6], self.table)
+        self.assertTrue(self.table.seats[1].action)
 
     def test_action_time_second_pass(self):
         """ If player has already acted, and been raised, can we set its action to True? """
         self.table.current_bet = 20
-        self.player1.equity = 10
-        self.player1.acted = True
-        app.action_time(self.player6, self.table)
-        self.assertTrue(self.player1.action)
+        self.table.seats[1].equity = 10
+        self.table.seats[1].acted = True
+        app.action_time(self.table.seats[6], self.table)
+        self.assertTrue(self.table.seats[1].action)
 
     def test_action_time_skip_all_in_player(self):
         """ Can we skip an all in player? """
-        self.player1.stack = 0
-        app.action_time(self.player6, self.table)
-        self.assertFalse(self.player1.action)
-        self.assertTrue(self.player2.action)
+        self.table.seats[1].stack = 0
+        app.action_time(self.table.seats[6], self.table)
+        self.assertFalse(self.table.seats[1].action)
+        self.assertTrue(self.table.seats[2].action)
 
     def test_action_handle_pre_folder(self):
         """  Does action time fold out and skip a player that has folded out of turn?"""
-        self.player2.folded = True
-        app.action_time(self.player1, self.table)
-        self.assertTrue(self.player2 not in self.table.pots[-1].players)
-        self.assertTrue(self.player3.action)
+        self.table.seats[2].folded = True
+        app.action_time(self.table.seats[1], self.table)
+        self.assertTrue(self.table.seats[2] not in self.table.pots[-1].players)
+        self.assertTrue(self.table.seats[3].action)
 
     def test_evaluate_pot_creates_side_pots(self):
         """ Can we create and append side pots appropriately? """
-        self.player1.stack = 0
-        self.player1.equity = 10
-        self.player2.stack = 0
-        self.player2.equity = 20
-        self.player3.stack = 0
-        self.player3.equity = 30
-        self.player4.stack = 0
-        self.player4.equity = 40
-        self.player5.stack = 100
-        self.player5.equity = 50
-        self.player6.stack = 100
-        self.player6.equity = 50
+        self.table.seats[1].stack = 0
+        self.table.seats[1].equity = 10
+        self.table.seats[2].stack = 0
+        self.table.seats[2].equity = 20
+        self.table.seats[3].stack = 0
+        self.table.seats[3].equity = 30
+        self.table.seats[4].stack = 0
+        self.table.seats[4].equity = 40
+        self.table.seats[5].stack = 100
+        self.table.seats[5].equity = 50
+        self.table.seats[6].stack = 100
+        self.table.seats[6].equity = 50
 
         app.create_deck(self.table)
 

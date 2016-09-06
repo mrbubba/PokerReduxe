@@ -1,9 +1,7 @@
 import unittest
 
 import analyze
-import app
 from card import Card
-from player import Player
 from pot import Pot
 from table import Table
 
@@ -11,27 +9,17 @@ from table import Table
 class TestAnalyze(unittest.TestCase):
     def setUp(self):
 
-        self.player1 = Player("player1", 100)
-        self.player2 = Player("player2", 100)
-        self.player3 = Player("player3", 100)
-        self.player4 = Player("player4", 100)
-        self.player5 = Player("player5", 100)
-        self.player6 = Player("player6", 100)
-        self.player7 = Player("player7", 100)
-        self.player8 = Player("player8", 100)
-        self.player9 = Player("player9", 100)
-
         self.table = Table("Table", 9, 1, 2, [50, 100])
 
-        self.table.join(1, self.player1, 100)
-        self.table.join(2, self.player2, 100)
-        self.table.join(3, self.player3, 100)
-        self.table.join(4, self.player4, 100)
-        self.table.join(5, self.player5, 100)
-        self.table.join(6, self.player6, 100)
-        self.table.join(7, self.player7, 100)
-        self.table.join(8, self.player8, 100)
-        self.table.join(9, self.player9, 100)
+        self.table.join(1, 'player1', 100)
+        self.table.join(2, 'player2', 100)
+        self.table.join(3, 'player3', 100)
+        self.table.join(4, 'player4', 100)
+        self.table.join(5, 'player5', 100)
+        self.table.join(6, 'player6', 100)
+        self.table.join(7, 'player7', 100)
+        self.table.join(8, 'player8', 100)
+        self.table.join(9, 'player9', 100)
 
         cards = [13, 'h', 14, 'h', 5, 'h', 5, 's', 5, 'h', 10, 'c', 3, 'h', 4,
                  'h', 13, 's', 14, 's', 14, 's', 5, 's', 12, 's',
@@ -72,8 +60,8 @@ class TestAnalyze(unittest.TestCase):
     def test_setup(self):
         """ Do we join the hole cards with the community cards? """
         analyze.setup(self.table)
-        self.assertEqual(7, len(self.player1.hole_cards))
-        self.assertEqual(7, len(self.player2.hole_cards))
+        self.assertEqual(7, len(self.table.seats[1].hole_cards))
+        self.assertEqual(7, len(self.table.seats[2].hole_cards))
 
     def test_order(self):
         """ Can we order the hands in a proper order, left to right """
@@ -170,7 +158,7 @@ class TestAnalyze(unittest.TestCase):
         analyze.convert_to_card_value(pot)
         analyze.matching(pot)
         analyze.compare(pot)
-        expected = self.player1
+        expected = self.table.seats[1]
         self.assertEqual(expected, pot.players[-1])
         self.assertTrue(len(pot.players) == 1)
 
@@ -186,7 +174,7 @@ class TestAnalyze(unittest.TestCase):
         analyze.convert_to_card_value(pot)
         analyze.matching(pot)
         analyze.compare(pot)
-        expected = [self.player1, self.player2]
+        expected = [self.table.seats[1], self.table.seats[2]]
         self.assertEqual(expected, pot.players)
 
     def test_award(self):
@@ -198,7 +186,7 @@ class TestAnalyze(unittest.TestCase):
         analyze.matching(pot)
         analyze.compare(pot)
         analyze.award(pot, self.table.sb_amount)
-        self.assertTrue(self.player1.stack == 200)
+        self.assertTrue(self.table.seats[1].stack == 200)
         self.assertTrue(len(pot.players) == 1)
 
     def test_award_multiple(self):
@@ -214,7 +202,7 @@ class TestAnalyze(unittest.TestCase):
         analyze.matching(pot)
         analyze.compare(pot)
         analyze.award(pot, self.table.sb_amount)
-        expected = [self.player1, self.player2]
+        expected = [self.table.seats[1], self.table.seats[2]]
         self.assertEqual(expected, pot.players)
 
     def test_award_indivisible(self):
