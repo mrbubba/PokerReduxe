@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import socket
+import json
 
 
 def game_socket(payload):
@@ -11,6 +12,7 @@ def game_socket(payload):
     sock.connect(server_address)
     sock.sendall(payload)
     data = sock.recv(1024)
+    data = json.loads(repr(data))
     sock.close()
     return data
 

@@ -1,4 +1,5 @@
 import socket
+import json
 
 
 from gamelogic.lobby import LobbyInstance
@@ -15,9 +16,26 @@ def socket_server():
         data = conn.recv(1024)
         if not data:
             break
-        data = repr(data)
-        if "GETLOBBY" in data:
-            payload = LobbyInstance.get_lobby()
-            # Run logic
-            conn.sendall(payload)
+        data = json.loads(repr(data))
+        d_object = data["object"]
+        d_action = data["action"]
+        if d_object == "Lobby":
+            if d_action == "get_lobby":
+                payload = LobbyInstance.get_lobby()
+                payload = json.dumps(payload)
+                conn.sendall(payload)
+            elif d_action == "create_table"
+                payload = LobbyInstance.create_table()
+                payload = json.dumps(payload)
+                conn.sendall(payload)
     conn.close()
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+from player import Player
+
 class Table(object):
     """
     Table holds the intermediate data needed for the app to drive the game
@@ -57,7 +59,7 @@ class Table(object):
     # @param key The key of the seat in seats dict.
     # @param player The player object in question
     # @param stack The players initial buy in
-    def join(self, key, player, stack):
+    def join(self, key, player_name, stack):
         # if player is in game already, he cant join
         if player in self.seats.values():
             raise ValueError("You can't join the same game twice")
@@ -73,6 +75,7 @@ class Table(object):
 
         # ensure seat is empty
         if not self.seats[key]:
+            player = Player(player_name, stack)
             self.seats[key] = player
             self.seats[key].stack = stack
             player.table = self
