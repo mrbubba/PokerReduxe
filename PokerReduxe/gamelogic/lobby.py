@@ -1,4 +1,4 @@
-from table import Table
+from PokerReduxe.gamelogic.table import Table
 
 
 class Lobby(object):
@@ -43,5 +43,3 @@ class Lobby(object):
 LobbyInstance = Lobby()
 
 
-response = { “name” : “table_name”, “blinds”: [sb, bb, ante], “buy_in”: [min, max], “seats” : int, “players”:
-[{ “name” : “player1”, “stack” : int, “equity” : int, “active”:bool, “action” : bool, “folded”: bool}]}

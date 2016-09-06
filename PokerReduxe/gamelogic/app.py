@@ -1,8 +1,8 @@
 import random
 
-from analyze import analyze
-from pot import Pot
-from card import Card
+from PokerReduxe.gamelogic.analyze import analyze
+from PokerReduxe.gamelogic.pot import Pot
+from PokerReduxe.gamelogic.card import Card
 # from lobby import Lobby
 
 
@@ -440,7 +440,6 @@ def action_time(player, table):
 
 
 def evaluate_pot(table):
-    # Todo:  Need more complete unit test coverage of this function
     """ Evaluates pot on table and creates side pots if necessary """
     pot = table.pots[-1]
     if pot.side_pots:

@@ -1,8 +1,8 @@
 import unittest
 
-import app
-from pot import Pot
-from table import Table
+import PokerReduxe.gamelogic.app as app
+from PokerReduxe.gamelogic.pot import Pot
+from PokerReduxe.gamelogic.table import Table
 
 
 class TestApp(unittest.TestCase):
@@ -239,6 +239,13 @@ class TestApp(unittest.TestCase):
         app.evaluate_pot(self.table)
         self.assertEqual(2, len(self.table.pots[-1].players))
         self.assertEqual(1060, self.table.pots[-2].amount)
+
+    def test_evaluate_pot_ends_hand_when_1_player(self):
+        """Do we end the hand and award the only hand the cash??"""
+        self.table.pots[-1].players = [self.table.seats[1]]
+        self.table.seats[1].equity = 50
+        app.evaluate_pot(self.table)
+        self.assertEqual(150, self.table.seats[1].stack)
 
 
 if __name__ == '__main__':

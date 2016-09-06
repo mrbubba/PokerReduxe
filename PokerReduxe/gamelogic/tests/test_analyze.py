@@ -1,9 +1,9 @@
 import unittest
 
-import analyze
-from card import Card
-from pot import Pot
-from table import Table
+import PokerReduxe.gamelogic.analyze as analyze
+from PokerReduxe.gamelogic.card import Card
+from PokerReduxe.gamelogic.pot import Pot
+from PokerReduxe.gamelogic.table import Table
 
 
 class TestAnalyze(unittest.TestCase):

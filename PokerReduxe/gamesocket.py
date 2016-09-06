@@ -2,7 +2,7 @@ import socket
 import json
 
 
-from gamelogic.lobby import LobbyInstance
+from PokerReduxe.gamelogic.lobby import LobbyInstance
 
 
 def socket_server():
@@ -24,7 +24,7 @@ def socket_server():
                 payload = LobbyInstance.get_lobby()
                 payload = json.dumps(payload)
                 conn.sendall(payload)
-            elif d_action == "create_table"
+            elif d_action == "create_table":
                 payload = LobbyInstance.create_table()
                 payload = json.dumps(payload)
                 conn.sendall(payload)

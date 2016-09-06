@@ -1,4 +1,4 @@
-from player import Player
+from PokerReduxe.gamelogic.player import Player
 
 class Table(object):
     """

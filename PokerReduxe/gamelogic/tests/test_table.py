@@ -1,6 +1,6 @@
 import unittest
 
-from table import Table
+from PokerReduxe.gamelogic.table import Table
 
 
 class TestTable(unittest.TestCase):
