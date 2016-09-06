@@ -18,7 +18,7 @@ class Lobby(object):
     def get_lobby(self):
         payload = {}
         for table in self.tables:
-            payload[table.table_name] = [table.seats, table.sb_amount, table.bb_amount, buy_in, ante]
+            payload[table.table_name] = [table.seats, table.sb_amount, table.bb_amount, table.buy_in, table.ante]
         return payload
 
     def create_table(self, name, seats, sb_amount, bb_amount, buy_in, ante=0):

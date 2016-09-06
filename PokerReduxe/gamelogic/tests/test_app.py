@@ -218,6 +218,13 @@ class TestApp(unittest.TestCase):
         self.assertFalse(self.player1.action)
         self.assertTrue(self.player2.action)
 
+    def test_action_handle_pre_folder(self):
+        """  Does action time fold out and skip a player that has folded out of turn?"""
+        self.player2.folded = True
+        app.action_time(self.player1, self.table)
+        self.assertTrue(self.player2 not in self.table.pots[-1].players)
+        self.assertTrue(self.player3.action)
+
     def test_evaluate_pot_creates_side_pots(self):
         """ Can we create and append side pots appropriately? """
         self.player1.stack = 0

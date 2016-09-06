@@ -6,7 +6,6 @@ from card import Card
 # from lobby import Lobby
 
 
-
 def get_active_players(table):
     active_players = []
     for player in table.seats.values():

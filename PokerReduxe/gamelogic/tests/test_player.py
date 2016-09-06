@@ -4,7 +4,6 @@ import unittest
 from player import Player
 from table import Table
 from pot import Pot
-import app
 
 
 class TestPlayer(unittest.TestCase):
@@ -68,11 +67,13 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(self.table.bet_increment, 50)
 
     def test_fold(self):
-        """ Can we fold a player out? """
+        """ Can we fold a player out?"""
         self.player.action = True
         self.player.fold()
         self.assertNotIn(self.player, self.table.pots[0].players)
         self.assertNotIn(self.player, self.table.pots[1].players)
+
+
 
 if __name__ == '__main__':
     unittest.main()
