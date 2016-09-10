@@ -3,7 +3,6 @@ import random
 from PokerReduxe.gamelogic.analyze import analyze
 from PokerReduxe.gamelogic.pot import Pot
 from PokerReduxe.gamelogic.card import Card
-# from lobby import Lobby
 
 
 def get_active_players(table):

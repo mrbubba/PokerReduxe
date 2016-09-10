@@ -67,8 +67,8 @@ class Table(object):
                 raise ValueError("You can't join the same game twice")
 
         # set buy in range
-        min_buy = self.buy_in[0]
-        max_buy = self.buy_in[1] + 1
+        min_buy = int(self.buy_in[0])
+        max_buy = int(self.buy_in[1]) + 1
 
         # ensure proper buyin
         if stack not in range(min_buy, max_buy):

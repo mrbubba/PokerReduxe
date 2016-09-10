@@ -70,6 +70,5 @@ class TestPlayer(unittest.TestCase):
         self.assertNotIn(self.table.seats[1], self.table.pots[1].players)
 
 
-
 if __name__ == '__main__':
     unittest.main()
