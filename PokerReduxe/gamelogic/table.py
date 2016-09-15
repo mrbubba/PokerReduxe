@@ -88,6 +88,7 @@ class Table(object):
 
     # @param player The player object to remove from seats
     def quit(self, player):
+        name = player.name
         if player.action:
             player.action = False
             player.fold()
@@ -97,6 +98,8 @@ class Table(object):
         for k, v in self.seats.items():
             if v == player:
                 self.seats[k] = None
+        payload = {"QUIT": name}
+        return payload
 
     def change_seat(self, player, ind):
         """ A player should be allowed to change to an open seat at the same table """

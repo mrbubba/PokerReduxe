@@ -57,11 +57,14 @@ def handler(data):
                     hole_cards.append(card.name)
             payload = {"hole_cards": hole_cards}
 
-        if d_action == "change_seat":
+        elif d_action == "change_seat":
             payload = table.change_seat(player, d_data[2])
 
-        if d_action == "join_table":
+        elif d_action == "join_table":
             payload = table.join(d_data[2], d_data[1], d_data[3])
+
+        if d_action == "quit":
+            payload = table.quit(player)
 
     payload = json.dumps(payload)
     return payload

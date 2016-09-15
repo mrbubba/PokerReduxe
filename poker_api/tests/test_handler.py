@@ -5,7 +5,6 @@ import json
 from poker_api.handler import handler
 from PokerReduxe.gamelogic.lobby import Lobby, LobbyInstance
 from PokerReduxe.gamelogic.card import Card
-from PokerReduxe.gamelogic.table import Table
 
 
 class TestHandler(unittest.TestCase):
@@ -90,6 +89,17 @@ class TestHandler(unittest.TestCase):
         result = json.loads(result)
         self.assertEqual(expected, result)
         self.assertTrue(self.lobby.tables[0].seats[2].name == 'Martha')
+
+    def test_quit(self):
+        """Can we quit a game?"""
+        data = {'item': 'TABLE', 'action': 'quit', 'data': ['testable', 'Bubba']}
+        expected = {"QUIT": "Bubba"}
+        data = json.dumps(data)
+        data = data.encode()
+        result = handler(data)
+        result = json.loads(result)
+        self.assertEqual(expected, result)
+        self.assertFalse(self.lobby.tables[0].seats[1])
 
     def tearDown(self):
         self.lobby.tables = []
