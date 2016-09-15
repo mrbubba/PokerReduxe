@@ -70,6 +70,17 @@ class TestHandler(unittest.TestCase):
         result = json.loads(result)
         self.assertEqual(expected, result)
 
+    def test_change_seat(self):
+        """can we change to a new seat"""
+        data = {'item': 'TABLE', 'action': 'change_seat', 'data': ['testable', 'Bubba', 2]}
+        expected = {"player_name": "Bubba", "seat_key": 2}
+        data = json.dumps(data)
+        data = data.encode()
+        result = handler(data)
+        result = json.loads(result)
+        self.assertEqual(expected, result)
+
+
     def tearDown(self):
         self.lobby.tables = []
 

@@ -110,3 +110,6 @@ class Table(object):
         self.seats[ind] = player
         player.stack = stack_save
         player.active = True
+        payload = {"player_name": player.name, "seat_key": ind}
+        return payload
+

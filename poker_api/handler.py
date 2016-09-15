@@ -56,5 +56,10 @@ def handler(data):
                     hole_cards.append(card.name)
             payload = {"hole_cards": hole_cards}
 
+        if d_action == "change_seat":
+            for key, value in table.seats.items():
+                if value and value.name == d_data[1]:
+                    player = table.seats[key]
+            payload = table.change_seat(player, d_data[2])
     payload = json.dumps(payload)
     return payload
