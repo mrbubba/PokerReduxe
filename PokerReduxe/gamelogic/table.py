@@ -81,6 +81,8 @@ class Table(object):
             self.seats[key] = player
             self.seats[key].stack = stack
             player.table = self
+            payload = {'player_name': player_name, 'player_stack': stack, 'seat': key}
+            return payload
         else:
             raise ValueError("Don't be rude, this seat is taken.")
 

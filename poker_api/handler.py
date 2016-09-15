@@ -46,20 +46,22 @@ def handler(data):
                        "table_stats": [len(table.seats), table.sb_amount, table.bb_amount, table.buy_in, table.ante,
                                        table.community_cards, action_player, first_player], "players": players,
                        "pots": pots}
-
+        if d_action != "view_table":
+            for key, value in table.seats.items():
+                if value and value.name == d_data[1]:
+                    player = table.seats[key]
         if d_action == "get_hole_cards":
             hole_cards = []
             if table.player_order:
-                player = [player for player in table.player_order if player.name == d_data[1]]
-                player = player[0]
                 for card in player.hole_cards:
                     hole_cards.append(card.name)
             payload = {"hole_cards": hole_cards}
 
         if d_action == "change_seat":
-            for key, value in table.seats.items():
-                if value and value.name == d_data[1]:
-                    player = table.seats[key]
             payload = table.change_seat(player, d_data[2])
+
+        if d_action == "join_table":
+            payload = table.join(d_data[2], d_data[1], d_data[3])
+
     payload = json.dumps(payload)
     return payload

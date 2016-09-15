@@ -80,6 +80,16 @@ class TestHandler(unittest.TestCase):
         result = json.loads(result)
         self.assertEqual(expected, result)
 
+    def test_join(self):
+        """can we join a table??"""
+        data = {'item': 'TABLE', 'action': 'join_table', 'data': ['testable', 'Martha', 2, 100]}
+        expected = {'player_name': 'Martha', 'player_stack': 100, 'seat': 2}
+        data = json.dumps(data)
+        data = data.encode()
+        result = handler(data)
+        result = json.loads(result)
+        self.assertEqual(expected, result)
+        self.assertTrue(self.lobby.tables[0].seats[2].name == 'Martha')
 
     def tearDown(self):
         self.lobby.tables = []
