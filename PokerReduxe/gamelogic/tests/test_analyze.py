@@ -1,5 +1,6 @@
 import unittest
 
+
 import PokerReduxe.gamelogic.analyze as analyze
 from PokerReduxe.gamelogic.card import Card
 from PokerReduxe.gamelogic.pot import Pot
@@ -60,8 +61,8 @@ class TestAnalyze(unittest.TestCase):
     def test_setup(self):
         """ Do we join the hole cards with the community cards? """
         analyze.setup(self.table)
-        self.assertEqual(7, len(self.table.seats[1].hole_cards))
-        self.assertEqual(7, len(self.table.seats[2].hole_cards))
+        self.assertEqual(7, len(self.table.seats[1].working_cards))
+        self.assertEqual(7, len(self.table.seats[2].working_cards))
 
     def test_order(self):
         """ Can we order the hands in a proper order, left to right """
@@ -69,8 +70,8 @@ class TestAnalyze(unittest.TestCase):
         analyze.order(pot)
         for player in pot.players:
             for i in range(6):
-                v1 = player.hole_cards[i].value
-                v2 = player.hole_cards[i + 1].value
+                v1 = player.working_cards[i].value
+                v2 = player.working_cards[i + 1].value
                 self.assertTrue(v2 <= v1)
 
     def test_flush(self):
@@ -92,7 +93,7 @@ class TestAnalyze(unittest.TestCase):
         analyze.convert_to_card_value(pot)
         for player in pot.players:
             if not player.hand:
-                for card in player.hole_cards:
+                for card in player.working_cards:
                     self.assertIsInstance(card, int)
 
     def test_straight(self):
@@ -192,10 +193,10 @@ class TestAnalyze(unittest.TestCase):
     def test_award_multiple(self):
         """ Can we pay out evenly to multiple winners """
         pot = analyze.setup(self.table)
-        pot.players[1].hole_cards[0].value = 14
-        pot.players[1].hole_cards[0].suit = 'h'
-        pot.players[1].hole_cards[1].value = 13
-        pot.players[1].hole_cards[1].suit = 'h'
+        pot.players[1].working_cards[0].value = 14
+        pot.players[1].working_cards[0].suit = 'h'
+        pot.players[1].working_cards[1].value = 13
+        pot.players[1].working_cards[1].suit = 'h'
         analyze.order(pot)
         analyze.flush(pot)
         analyze.convert_to_card_value(pot)

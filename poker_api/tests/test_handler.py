@@ -101,6 +101,19 @@ class TestHandler(unittest.TestCase):
         self.assertEqual(expected, result)
         self.assertFalse(self.lobby.tables[0].seats[1])
 
+#    def test_bet(self):
+#        """Can we place a bet?"""
+#        self.lobby.tables[0].join(2, "Martha", 100)
+#        self.lobby.tables[0].player_order.append(self.lobby.tables[0].seats[2])
+#        data = {'item': 'PLAYER', 'action': 'bet', 'data': ['testable', 'Bubba', 50]}
+#        expected = {'player_bet': 50, 'action_player': 'Martha'}
+#        data = json.dumps(data)
+#        data = data.encode()
+#        result = handler(data)
+#        result = json.loads(result)
+#        self.assertEqual(expected, result)
+#        self.assertTrue(self.lobby.tables[0].seats[1].action)
+
     def tearDown(self):
         self.lobby.tables = []
 

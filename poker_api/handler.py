@@ -65,6 +65,14 @@ def handler(data):
 
         if d_action == "quit":
             payload = table.quit(player)
+    elif d_item == "PLAYER":
+        table = [table for table in LobbyInstance.tables if table.table_name == d_data[0]]
+        table = table[0]
+        for key, value in table.seats.items():
+            if value and value.name == d_data[1]:
+                player = table.seats[key]
 
+        if d_action == "bet":
+            payload = player.bet(d_data[2])
     payload = json.dumps(payload)
     return payload

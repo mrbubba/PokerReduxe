@@ -341,6 +341,7 @@ def set_player_table_attributes(table):
 
     for player in table.player_order:
         player.hand = []
+        player.working_cards = []
         player.hole_cards = []
         player.acted = False
         player.folded = False
