@@ -404,6 +404,8 @@ def _action_engine(table, inc):
         evaluate_pot(table)
     else:
         pot.players[inc].action = True
+        payload = {'action_player': pot.players[inc].name}
+        return payload
 
 
 def action_time(player, table):

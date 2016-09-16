@@ -2,6 +2,7 @@ payload = {}
 payload['pots'] = []
 payload['winners'] = []
 
+
 def setup(table):
     """get the players in the pot and their hands"""
     pot = table.pots.pop()
@@ -12,7 +13,8 @@ def setup(table):
         if not player.hand:
             player.working_cards = player.hole_cards[:]
             player.working_cards += table.community_cards
-            py_pot['players'].append(player.name)
+            py_player = [player.name, player.hole_cards[0].name, player.hole_cards[1].name]
+            py_pot['players'].append(py_player)
     payload['pots'].append(py_pot)
     return pot
 

@@ -46,6 +46,7 @@ class Player(object):
         """When a player action is set to true, bet is the method by which
         a player bets calls or checks appropriately."""
         if self.action:
+            payload = {}
             #  A player can always go all in no matter the current_bet
             if amount == self.stack:
                 pass
@@ -71,7 +72,13 @@ class Player(object):
 
             # Set players action to False
             self.action = False
-            action_time(self, self.table)
+            payload["player"] = self.name
+            payload["player_bet"] = amount
+            payload['new_round'] = 'False'
+            payload_bundle = action_time(self, self.table)
+            payload['action_player'] = payload_bundle['action_player']
+            if 'new_round' not in payload_bundle:
+                return payload
 
     def fold(self):
         """ Set fold attribute to True and action to False """
