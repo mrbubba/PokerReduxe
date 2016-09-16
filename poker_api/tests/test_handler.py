@@ -117,6 +117,22 @@ class TestHandler(unittest.TestCase):
         self.assertEqual(expected, result)
         self.assertTrue(self.lobby.tables[0].seats[2].action)
 
+    def test_bet_new_round(self):
+        """Can we place a bet, and start a new betting round?"""
+        self.lobby.tables[0].join(2, "Martha", 100)
+        self.lobby.tables[0].player_order.append(self.lobby.tables[0].seats[2])
+        pot = Pot(self.lobby.tables[0].player_order, 100)
+        self.lobby.tables[0].pots.append(pot)
+        self.lobby.tables[0].seats[2].acted = True
+        self.lobby.tables[0].seats[2].equity = 50
+        data = {'item': 'PLAYER', 'action': 'bet', 'data': ['testable', 'Bubba', 50]}
+        expected = {'player': 'Bubba', 'player_bet': 50, 'action_player': 'Martha', 'new_round': 'False'}
+        data = json.dumps(data)
+        data = data.encode()
+        result = handler(data)
+        result = json.loads(result)
+        self.assertEqual(expected, result)
+
     def tearDown(self):
         self.lobby.tables = []
 
