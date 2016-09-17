@@ -404,8 +404,6 @@ def _action_engine(table, inc):
         evaluate_pot(table)
     else:
         pot.players[inc].action = True
-        payload = {'action_player': pot.players[inc].name}
-        return payload
 
 
 def action_time(player, table):
@@ -490,6 +488,8 @@ def evaluate_pot(table):
                 deal(table)
             analyze(table)
     else:
+        for player in pot.players:
+            player.acted = False
         if len(table.community_cards) < 5:
             deal(table)
         else:

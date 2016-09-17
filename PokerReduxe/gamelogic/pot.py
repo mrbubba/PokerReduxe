@@ -8,8 +8,6 @@ class Pot(object):
         @property {list} players A list of player objects in pot
         @property {int} amount Amount of chips in the pot
         @property {list} side_pots
-
-
     """
     def __init__(self, players, amount):
         self.players = players

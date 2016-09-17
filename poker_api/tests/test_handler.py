@@ -1,136 +1,72 @@
-import unittest
 import json
+import unittest
 
-
-from poker_api.handler import handler
+from PokerReduxe.gamelogic.card import Card
 from PokerReduxe.gamelogic.lobby import LobbyInstance
 from PokerReduxe.gamelogic.pot import Pot
-from PokerReduxe.gamelogic.card import Card
+from poker_api.handler import handler, handler_response
 
 
 class TestHandler(unittest.TestCase):
-
     def setUp(self):
         self.lobby = LobbyInstance
+
         self.lobby.create_table("Bubba", 100, "testable", 6, 2, 4, [50, 100], 0)
-        self.lobby.tables[0].player_order.append(self.lobby.tables[0].seats[1])
-        self.lobby.tables[0].player_order[0].action = True
+        bc1 = Card("10_hearts", 10, "h")
+        bc2 = Card("Ace_hearts", 14, "h")
+        self.lobby.tables[-1].seats[1].hole_cards = [bc1, bc2]
+        self.lobby.tables[-1].seats[1].action = True
+        self.lobby.tables[-1].seats[1].equity = 2
+        self.lobby.tables[-1].join(2, "Martha", 100)
+        mc1 = Card("7_diamonds", 7, "d")
+        mc2 = Card("2_clubs", 2, "c")
+        self.lobby.tables[-1].seats[2].hole_cards = [mc1, mc2]
+        self.lobby.tables[-1].seats[2].equity = 10
+        cc1 = Card("King_hearts", 13, "h")
+        cc2 = Card("9_hearts", 9, "h")
+        cc3 = Card("Jack_hearts", 11, "h")
+        self.lobby.tables[-1].player_order.append(self.lobby.tables[-1].seats[1])
+        self.lobby.tables[-1].player_order.append(self.lobby.tables[-1].seats[2])
+        self.lobby.tables[-1].community_cards.append(cc1)
+        self.lobby.tables[-1].community_cards.append(cc2)
+        self.lobby.tables[-1].community_cards.append(cc3)
+        pot1 = Pot(self.lobby.tables[-1].player_order, 100)
+        pot2 = Pot(self.lobby.tables[-1].player_order, 100)
+        self.lobby.tables[-1].pots = [pot1, pot2]
+
+        self.lobby.create_table("Bubba", 100, "testable2", 6, 2, 4, [50, 100], 0)
+        self.lobby.tables[-1].seats[1].hole_cards = [bc1, bc2]
+        self.lobby.tables[-1].seats[1].action = True
+        self.lobby.tables[-1].seats[1].equity = 2
+        self.lobby.tables[-1].join(2, "Martha", 100)
+        self.lobby.tables[-1].seats[2].hole_cards = [mc1, mc2]
+        self.lobby.tables[-1].seats[2].equity = 10
+        self.lobby.tables[-1].player_order.append(self.lobby.tables[-1].seats[1])
+        self.lobby.tables[-1].player_order.append(self.lobby.tables[-1].seats[2])
+        self.lobby.tables[-1].community_cards.append(cc1)
+        self.lobby.tables[-1].community_cards.append(cc2)
+        self.lobby.tables[-1].community_cards.append(cc3)
+        self.lobby.tables[-1].pots = [pot1, pot2]
 
     def test_get_lobby(self):
         """  can we get the table list from lobby?"""
         data = {"item": "LOBBY", "action": "get_lobby", "data": []}
         data = json.dumps(data)
         data = data.encode()
-        payload = handler(data)
-        result = {"tables":  [{"testable": [1, 6, 2, 4, 0, [50, 100]]}]}
-        result = json.dumps(result)
-        self.assertEqual(result, payload)
-
-    def test_create_table(self):
-        """  Can we create a table ??"""
-        data = {"item": "LOBBY", "action": "create_table", "data":
-                ["Bubba", 100, "testable2", 6, 2, 4, [50, 100], 0]}
-        data = json.dumps(data)
-        data = data.encode()
-        handler(data)
-        self.assertEqual(LobbyInstance.tables[-1].table_name, "testable2")
-
-    def test_table_with_the_same_name_exception(self):
-        """  Do we get an exception if the table name is not unique"""
-        data = {"item": "LOBBY", "action": "create_table", "data":
-            ["Bubba", 100, "testable", 6, 2, 4, [50, 100], 0]}
-        data = json.dumps(data)
-        data = data.encode()
-        with self.assertRaises(Exception):
-            handler(data)
-        self.assertEqual(1, len(self.lobby.tables))
-
-    def test_view_table(self):
-        """  Can we get all of the information we need from a table??"""
-        data = {"item": "TABLE", "action": "view_table", "data": ['testable']}
-        expected = {'table': 'testable', 'table_stats': [6, 2, 4, [50, 100], 0, [], 'Bubba', 'Bubba'],
-                    'players': {'Bubba': [1, 100, 0, False, True]}, 'pots': []}
-        data = json.dumps(data)
-        data = data.encode()
         result = handler(data)
-        result = json.loads(result)
-        self.assertEqual(result, expected)
-
-    def test_get_hole_cards(self):
-        """can we get the names of our hole cards??"""
-        c1 = Card("10c", 10, "c")
-        c2 = Card("10d", 10, "d")
-        self.lobby.tables[0].seats[1].hole_cards.append(c1)
-        self.lobby.tables[0].seats[1].hole_cards.append(c2)
-        data = {"item": "TABLE", "action": "get_hole_cards", "data": ["testable", "Bubba"]}
-        expected = {'hole_cards': ["10c", "10d"]}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
+        expected = {"tables": {"testable": [2, 6, 2, 4, 0, [50, 100]],
+                               "testable2": [2, 6, 2, 4, 0, [50, 100]]}}
         self.assertEqual(expected, result)
 
-    def test_change_seat(self):
-        """can we change to a new seat"""
-        data = {'item': 'TABLE', 'action': 'change_seat', 'data': ['testable', 'Bubba', 2]}
-        expected = {"player_name": "Bubba", "seat_key": 2}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
-        self.assertEqual(expected, result)
+    def test_response(self):
+        """can we get all of the data for a table object?"""
+        result = handler_response(self.lobby.tables[0])
 
-    def test_join(self):
-        """can we join a table??"""
-        data = {'item': 'TABLE', 'action': 'join_table', 'data': ['testable', 'Martha', 2, 100]}
-        expected = {'player_name': 'Martha', 'player_stack': 100, 'seat': 2}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
-        self.assertEqual(expected, result)
-        self.assertTrue(self.lobby.tables[0].seats[2].name == 'Martha')
-
-    def test_quit(self):
-        """Can we quit a game?"""
-        data = {'item': 'TABLE', 'action': 'quit', 'data': ['testable', 'Bubba']}
-        expected = {"QUIT": "Bubba"}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
-        self.assertEqual(expected, result)
-        self.assertFalse(self.lobby.tables[0].seats[1])
-
-    def test_bet(self):
-        """Can we place a bet, and get the new action player?"""
-        self.lobby.tables[0].join(2, "Martha", 100)
-        self.lobby.tables[0].player_order.append(self.lobby.tables[0].seats[2])
-        pot = Pot(self.lobby.tables[0].player_order, 100)
-        self.lobby.tables[0].pots.append(pot)
-        data = {'item': 'PLAYER', 'action': 'bet', 'data': ['testable', 'Bubba', 50]}
-        expected = {'player': 'Bubba', 'player_bet': 50, 'action_player': 'Martha', 'new_round': 'False'}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
-        self.assertEqual(expected, result)
-        self.assertTrue(self.lobby.tables[0].seats[2].action)
-
-    def test_bet_new_round(self):
-        """Can we place a bet, and start a new betting round?"""
-        self.lobby.tables[0].join(2, "Martha", 100)
-        self.lobby.tables[0].player_order.append(self.lobby.tables[0].seats[2])
-        pot = Pot(self.lobby.tables[0].player_order, 100)
-        self.lobby.tables[0].pots.append(pot)
-        self.lobby.tables[0].seats[2].acted = True
-        self.lobby.tables[0].seats[2].equity = 50
-        data = {'item': 'PLAYER', 'action': 'bet', 'data': ['testable', 'Bubba', 50]}
-        expected = {'player': 'Bubba', 'player_bet': 50, 'action_player': 'Martha', 'new_round': 'False'}
-        data = json.dumps(data)
-        data = data.encode()
-        result = handler(data)
-        result = json.loads(result)
+        expected = {"table": "testable", "table_stats":
+            [6, 2, 4, [50, 100], 0, ["King_hearts", "9_hearts", "Jack_hearts"],
+             "Bubba", "Bubba"], "players": {"Bubba": [1, 100, 2, False, True, "10_hearts", "Ace_hearts"],
+                                            "Martha": [2, 100, 10, False, True, "7_diamonds", "2_clubs"]},
+                    "pots": [[100, ["Bubba", "Martha"]], [100, ["Bubba", "Martha"]]]}
         self.assertEqual(expected, result)
 
     def tearDown(self):

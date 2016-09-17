@@ -72,13 +72,7 @@ class Player(object):
 
             # Set players action to False
             self.action = False
-            payload["player"] = self.name
-            payload["player_bet"] = amount
-            payload['new_round'] = 'False'
-            payload_bundle = action_time(self, self.table)
-            payload['action_player'] = payload_bundle['action_player']
-            if 'new_round' not in payload_bundle:
-                return payload
+            action_time(self, self.table)
 
     def fold(self):
         """ Set fold attribute to True and action to False """

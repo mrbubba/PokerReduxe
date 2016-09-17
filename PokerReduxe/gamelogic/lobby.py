@@ -15,18 +15,6 @@ class Lobby(object):
     def __init__(self):
         self.tables = []
 
-    def get_lobby(self):
-        payload = {"tables": []}
-        for table in self.tables:
-            num_players = 0
-            for v in table.seats:
-                if table.seats[v] is not None:
-                    num_players += 1
-            payload_item = {table.table_name: [num_players, len(table.seats), table.sb_amount,
-                                               table.bb_amount, table.ante, table.buy_in]}
-            payload["tables"].append(payload_item)
-        return payload
-
     def create_table(self, player_name, stack, table_name, seats,
                      sb_amount, bb_amount, buy_in, ante=0):
         if self.tables:
@@ -36,11 +24,5 @@ class Lobby(object):
         table = Table(table_name, seats, sb_amount, bb_amount, buy_in, ante)
         table.join(1, player_name, stack)
         self.tables.append(table)
-        payload = {'table_name': table_name}
-        return payload
-
-    def get_table(self, table_name):
-        table = [table for table in self.tables if table.table_name == table_name]
-        return table
 
 LobbyInstance = Lobby()
