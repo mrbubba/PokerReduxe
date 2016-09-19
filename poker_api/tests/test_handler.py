@@ -54,6 +54,7 @@ class TestHandler(unittest.TestCase):
         data = json.dumps(data)
         data = data.encode()
         result = handler(data)
+        result = json.loads(result)
         expected = {"tables": {"testable": [2, 6, 2, 4, 0, [50, 100]],
                                "testable2": [2, 6, 2, 4, 0, [50, 100]]}}
         self.assertEqual(expected, result)
@@ -61,7 +62,7 @@ class TestHandler(unittest.TestCase):
     def test_response(self):
         """can we get all of the data for a table object?"""
         result = handler_response(self.lobby.tables[0])
-
+        result = json.loads(result)
         expected = {"table": "testable", "table_stats":
             [6, 2, 4, [50, 100], 0, ["King_hearts", "9_hearts", "Jack_hearts"],
              "Bubba", "Bubba"], "players": {"Bubba": [1, 100, 2, False, True, "10_hearts", "Ace_hearts"],

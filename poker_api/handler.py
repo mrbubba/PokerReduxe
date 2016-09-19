@@ -53,7 +53,7 @@ def handler(data):
             payload["tables"] = {}
             if LobbyInstance.tables:
                 for table in LobbyInstance.tables:
-                    num_players = 0a
+                    num_players = 0
                     for v in table.seats:
                         if table.seats[v] is not None:
                             num_players += 1
