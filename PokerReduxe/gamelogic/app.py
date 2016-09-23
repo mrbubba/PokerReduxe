@@ -354,10 +354,13 @@ def create_initial_pot(table):
     for player in table.player_order:
         if player and player.equity >= table.ante:
             amount += table.ante
+            player.equity -= table.ante
         elif player:
             amount += player.equity
-        if player and player.equity > table.bb_amount + table.ante:
-            amount += player.equity - (table.bb_amount + table.ante)
+            player.equity = 0
+            side_pots.append(0)
+        if player and player.equity > table.bb_amount:
+            amount += player.equity - table.bb_amount
             player.equity = table.bb_amount
         if player and not player.stack:
             side_pots.append(player.equity)
