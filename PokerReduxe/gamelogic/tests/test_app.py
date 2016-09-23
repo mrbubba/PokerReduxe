@@ -96,6 +96,8 @@ class TestApp(unittest.TestCase):
         """ Can we set missed sb to True """
         self.table.seats[2].active = False
         self.table.seats[2].acted = True
+        import pdb
+        pdb.set_trace()
         app.move_button(self.table)
         self.assertTrue(self.table.seats[2].missed_sb)
 
@@ -165,7 +167,6 @@ class TestApp(unittest.TestCase):
         app.create_initial_pot(self.table)
         self.assertEqual(12, self.table.seats[3].equity)
         self.assertEqual(61, self.table.pots[0].amount)
-        self.assertEqual(10, self.table.pots[0].side_pots[0])
 
     def test_deck_is(self):
         """ Can we ensure that we have a full deck? """

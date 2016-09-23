@@ -3,6 +3,7 @@ import unittest
 from PokerReduxe.gamelogic.table import Table
 
 
+
 class TestTable(unittest.TestCase):
     """ Do we have a working table object? """
 

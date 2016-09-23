@@ -1,9 +1,9 @@
 import random
 
 from PokerReduxe.gamelogic.analyze import analyze
-from PokerReduxe.gamelogic.pot import Pot
 from PokerReduxe.gamelogic.card import Card
-
+from PokerReduxe.gamelogic.pot import Pot
+from PokerReduxe.gamelogic.lobby import LobbyInstance
 
 def get_active_players(table):
     active_players = []
@@ -64,7 +64,8 @@ def new_hand(table):
     # TODO:Include a way to remove game from lobby. Ends Game.
 
     # determine if move or set button
-
+    if len(active_players) == 1:
+        return LobbyInstance.idle_tables.append(table)
     # set button if going from head to head to 3 or more
     if len(active_players) > 2 and len(table.player_order) == 2:
         set_button(table)
@@ -146,140 +147,120 @@ def set_button(table):
         if sb > len(table.seats):
             sb = 1
 
+    collect_blinds(table)
+    create_initial_pot(table)
+    deal_hole(table)
+
     return table.player_order
 
 
 def move_button(table):
-    """ Setting the table """
-
-    # Set the last hand order to table
+    """setting the table"""
     table.last_order = table.player_order[:]
 
-    # Check for None value remove if present
-    if table.player_order[0] is None:
+    active_players = get_active_players(table)
+
+    #  We need to establish the new playing order
+    if not table.player_order[0]:
         table.player_order.pop(0)
+    else:
+        table.player_order.append(table.player_order.pop(0))
 
-    # Check active players
-    check_active_players(table)
+    # deal with head to head cases
+    if len(table.last_order) == 2:
+        for player in table.last_order:
+            if player not in active_players:
+                return set_button(table)
 
-    # Check for MIA BB
-    if table.last_order[1] not in table.player_order:
-        table.player_order.insert(0, None)
-    elif table.last_order[0] is not None:
-        # Pop off first value in player order and add to end
-        x = table.player_order.pop(0)
-        table.player_order.append(x)
-
-    # Check/Set missed bb
-    last_bb_key = None
-    if table.last_order[1] in table.player_order:
-        # Grab last bb seat number
-        for k, v in table.seats.items():
-            if v == table.last_order[1]:
-                last_bb_key = k + 1
-
-        # Grab current bb seat number
-        current_bb_key = None
-        for k, v in table.seats.items():
+    else:
+        #  We need to set missed big blinds appropriately
+        # we need the seat ints of both the last and current bb to determine missed bb
+        inc = table.bb_seat + 1
+        if inc > len(table.seats):
+            inc = 1
+        for k, v in table.seats:
             if v == table.player_order[1]:
-                current_bb_key = k
+                new_bb = k
+        while inc is not new_bb:
+            if table.seats[inc]:
+                table.seats[inc].missed_bb = True
+            inc += 1
+            if inc > len(table.seats):
+                inc = 1
+        # now we need to check for a dead small blind
+        if not table.seats[table.bb_seat]:
+            table.player_order.insert(0, None)
+        # now we have to find the missed small blinds
+        inc = table.sb_seat + 1
+        if inc > len(table.seats):
+            inc = 1
+        while inc is not table.bb.seats:
+            if table.seats[inc] and table.seats[inc] in table.last_order:
+                table.seats[inc].missed_sb = True
+        # set bought button and exclude players appropriately
+        if table.player_order[0].missed_bb:
+            table.bought_button = True
+            while table.player_order[1].missed_bb:
+                table.player_order.remove(1)
 
-        # Iterate seats between last bb and current bb to missed_bb True
-        while last_bb_key != current_bb_key:
-            if table.seats[last_bb_key]:
-                table.seats[last_bb_key].missed_bb = True
-            last_bb_key += 1
-            if last_bb_key > len(table.seats):
-                last_bb_key = 1
+        # we appropriately set the sb and bb seats attributes for the next hand
+        table.sb_seat = table.bb_seat
+        table.bb_seat = new_bb
 
-    # Check/Set missed sb
-    # if last sb is none, and current sb is none, nobody missed sb
-    if table.last_order[0] is not None:
-        # Grab last sb seat number
-        last_sb_key = None
-        for k, v in table.seats.items():
-            if v == table.last_order[0]:
-                last_sb_key = k + 1
+        #  If you weren't small blind last turn, you can't be button this turn.
+        if table.last_order[0] and table.last_order[0] in table.player_order:
+            while table.player_order[-1] is not table.last_order[0]:
+                table.player_order[-1].missed_sb = True
+                table.player_order.pop()
+        while table.player_order[-1].missed_sb or table.player_order[-1].missed_bb:
+            table.player_order.pop()
 
-        # Grab current sb seat number
-        current_sb_key = None
-        if table.player_order[0] is not None:
-            for k, v in table.seats.items():
-                if v == table.player_order[0]:
-                    current_sb_key = k
-        else:
-            for k, v in table.seats.items():
-                if v == table.player_order[1]:
-                    current_sb_key = k
-
-        # Iterate seats between last sb and current sb to missed_sb True
-        while last_sb_key != current_sb_key:
-            if table.seats[last_sb_key].acted or table.seats[last_sb_key].missed_bb:
-                table.seats[last_sb_key].missed_sb = True
-            last_sb_key += 1
-            if last_sb_key > len(table.seats):
-                last_sb_key = 1
-
-
-def missed_blind_corner_cases(table):
-    # Remove people who missed blinds from button position
-    while len(table.player_order) > 2:
-        button = table.player_order[-1]
-        if button.missed_sb or button.missed_bb:
-            table.player_order.remove(button)
-        else:
-            break
-
-    # Allow bought button
-    if table.player_order[0].missed_bb:
-        table.player_order[0].missed_bb = False
-        table.player_order[0].missed_sb = False
-        if table.player_order[0].stack >= table.sb_amount + table.bb_amount:
-            table.player_order[0].stack -= table.sb_amount + table.bb_amount
-            table.player_order[0].equity += table.sb_amount + table.bb_amount
-        else:
-            table.player_order[0].equity = table.player_order[0].stack
-            table.player_order[0].stack = 0
-
-        x = False
-        while not x:
-            # Only one person can buy button at a time
-            if table.player_order[1].missed_bb:
-                table.player_order.pop(1)
-            else:
-                x = True
+    collect_blinds(table)
+    collect_missed_blinds(table)
+    create_initial_pot(table)
+    set_player_table_attributes(table)
+    create_deck(table)
+    deal_hole(table)
 
 
 def collect_blinds(table):
-    # Check for head to head
+    # Check for head to head or bought button
     # Else normal order
     if len(table.player_order) == 2:
         sb = table.player_order[1]
         bb = table.player_order[0]
-    else:
+    elif table.bought_button:
         sb = table.player_order[0]
-        bb = table.player_order[1]
+        bb = table.player_order[0]
 
-    # Check for bought button
-    if sb is not None and sb.equity > 0:
-        return
-    if sb is not None:
+    if table.bought_button:
+        if bb.stack >= table.bb_amount + table.sb_amount:
+            bb.equity = table.bb_amount + table.sb_amount
+            bb.stack -= table.bb_amount + table.sb_amount
+        else:
+            bb.equity = bb.stack
+            bb.stack = 0
+
+    # Collect the big blind
+    if not table.bought_button and bb.stack >= table.bb_amount:
+        bb.equity = table.bb_amount
+        bb.stack -= table.bb_amount
+    elif not table.bought_button:
+        bb.equity = bb.stack
+        bb.stack = 0
+
+    if sb is not None and not table.bought_button:
         # Collect the small blind
         if sb.stack >= table.sb_amount:
             sb.equity += table.sb_amount
             sb.stack -= table.sb_amount
         else:
-            sb.equity = sb.stack
+            sb.equity += sb.stack
             sb.stack = 0
-    # Collect the big bling
-    if bb.stack >= table.bb_amount:
-        bb.equity = table.bb_amount
-        bb.stack -= table.bb_amount
-    else:
-        bb.equity = bb.stack
-        bb.stack = 0
+    # set missed blinds to False
     bb.missed_bb = False
-    bb.missed_sb = False
+    if sb:
+        sb.missed_sb = False
 
 
 def collect_missed_blinds(table):
@@ -305,7 +286,8 @@ def collect_missed_blinds(table):
 
 def create_initial_pot(table):
     amount = 0
-    side_pots_tmp = []
+    side_pots = []
+    # if there are antes take them
     if table.ante > 0:
         for player in table.player_order:
             if player.stack > table.ante:
@@ -313,22 +295,25 @@ def create_initial_pot(table):
                 player.stack -= table.ante
                 player.equity += table.ante
             else:
-                player.equity = player.stack
+                player.equity += player.stack
                 amount += player.stack
-                side_pots_tmp.append(player.stack)
                 player.stack = 0
-            if player.equity > (table.bb_amount + table.ante):
-                amount += (player.equity - (table.bb_amount + table.ante))
-                player.equity = table.bb_amount + table.ante
+    # set correct equities and add side pots as necessary
+    for player in table.player_order:
+        if player.equity > table.bb_amount + table.ante:
+            amount += player.equity - (table.bb_amount + table.ante)
+            player.equity = table.bb_amount + table.ante
+        if not player.stack:
+            side_pots.append(player.equity)
+        if player.equity > table.bb_amount:
+            amount += player.equity - table.bb_amount
+            player.equity = table.bb_amount
 
     # instantiate pot object
     players = table.player_order[:]
     pot = Pot(players, amount)
-
-    # append side pots to Pot obj in case of all-in players
-    if side_pots_tmp:
-        for p in side_pots_tmp:
-            pot.side_pots.append(p)
+    # add the side_pots list
+    pot.side_pots = side_pots
 
     # Add the initial pot to the table
     table.pots.append(pot)
@@ -384,8 +369,9 @@ def deal_hole(table):
 
     inc = 2
     # Set Inc for head to head
-    if len(table.player_order) == 2:
+    if len(table.player_order) == 2 or table.bought_button:
         inc = 1
+    table.bought_button = False
     player = table.pots[-1].players[inc]
     table.current_bet = table.bb_amount
     action_time(player, table)
@@ -487,6 +473,7 @@ def evaluate_pot(table):
             while len(table.community_cards) < 5:
                 deal(table)
             analyze(table)
+            new_hand(table)
     else:
         for player in pot.players:
             player.acted = False
@@ -494,6 +481,7 @@ def evaluate_pot(table):
             deal(table)
         else:
             analyze(table)
+            new_hand(table)
 
 
 def deal(table):

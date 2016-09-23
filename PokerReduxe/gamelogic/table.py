@@ -20,6 +20,9 @@ class Table(object):
         @property {list} community_cards A list containing card names
         @property {int} bet_increment The minimum amount the bet can be raised
         @property {int} current_bet Amount to call
+        @property {int} bought_button indicates if the sb player buy the button(post both big and small blind)
+        @property {int} bb_seat seat number of the current big blind player
+        @property {int} sb_seat seat number of the current small blind player
 
 
     METHODS:
@@ -48,6 +51,9 @@ class Table(object):
         self.community_cards = []
         self.bet_increment = bb_amount
         self.current_bet = 0
+        self.bought_button = False
+        self.bb_seat = None
+        self.sb_seat = None
 
     # @param seats The num of seats passed in instantiation
     # @return null
