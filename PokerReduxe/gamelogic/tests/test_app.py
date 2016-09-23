@@ -83,6 +83,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(self.table.player_order[0], None)
         expected = self.table.player_order[:]
         expected.pop(0)
+        expected.insert(0, None)
         app.move_button(self.table)
         self.assertEqual(expected, self.table.player_order)
 
@@ -95,31 +96,28 @@ class TestApp(unittest.TestCase):
     def test_set_missed_sb(self):
         """ Can we set missed sb to True """
         self.table.seats[2].active = False
-        self.table.seats[2].acted = True
-        import pdb
-        pdb.set_trace()
         app.move_button(self.table)
         self.assertTrue(self.table.seats[2].missed_sb)
 
     def test_remove_missed_blinds_from_button(self):
         """ Can we remove people who owe blinds in the button position? """
         self.table.seats[6].missed_bb = True
-        self.table.seats[5].missed_sb = True
-        app.missed_blind_corner_cases(self.table)
+        self.table.seats[1].missed_sb = True
+        app.move_button(self.table)
         self.assertEqual(4, len(self.table.player_order))
 
     def test_bought_button(self):
         """ Can we appropriately allow someone to buy the button? """
-        self.table.seats[1].missed_bb = True
-        app.missed_blind_corner_cases(self.table)
-        self.assertEqual(3, self.table.seats[1].equity)
-        self.assertEqual(0, self.table.seats[2].equity)
+        self.table.seats[2].missed_bb = True
+        app.move_button(self.table)
+        self.assertEqual(2, self.table.seats[2].equity)
+        self.assertEqual(0, self.table.seats[3].equity)
 
     def test_only_one_bought_button(self):
         """ Can we ensure only one bought button? """
-        self.table.seats[1].missed_bb = True
         self.table.seats[2].missed_bb = True
-        app.missed_blind_corner_cases(self.table)
+        self.table.seats[3].missed_bb = True
+        app.move_button(self.table)
         self.assertEqual(5, len(self.table.player_order))
 
     def test_collect_all_blinds(self):
@@ -142,6 +140,7 @@ class TestApp(unittest.TestCase):
     def test_dont_collect_blinds_if_button_has_been_bought(self):
         """ Can we ensure that we dont collect bb if button is bought """
         self.table.seats[1].equity = 3
+        self.table.bought_button = True
         app.collect_blinds(self.table)
         self.assertEqual(3, self.table.seats[1].equity)
         self.assertEqual(0, self.table.seats[2].equity)
@@ -165,7 +164,7 @@ class TestApp(unittest.TestCase):
         self.table.seats[5].stack = 10
         self.table.ante = 10
         app.create_initial_pot(self.table)
-        self.assertEqual(12, self.table.seats[3].equity)
+        self.assertEqual(2, self.table.seats[3].equity)
         self.assertEqual(61, self.table.pots[0].amount)
 
     def test_deck_is(self):
