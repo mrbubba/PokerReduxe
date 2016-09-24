@@ -110,12 +110,25 @@ class Table(object):
     def change_seat(self, player, ind):
         """ A player should be allowed to change to an open seat at the same table """
         # Check for seats range
+        for k, v in player.seats.items():
+            if v == player:
+                current_seat = k
         if ind >= len(self.seats):
             raise Exception("This seat doesn't exist!!")
         # Check if seat is occupied
         if self.seats[ind] is not None:
             raise Exception("This seat is occupied!!")
-
+        next_seat = current_seat + 1
+        if next_seat > len(self.seats):
+            next_seat = 1
+        while not self.seats[next_seat]:
+            next_seat += 1
+            if next_seat > len(self.seats):
+                next_seat = 1
+        next_player_ind = self.player_order.index(self.seats[next_seat])
+        if next_player_ind > self.player_order.index(player)
+            player.missed_bb = True
+            player.missed_sb = True
         stack_save = player.stack
         self.quit(player)
         self.seats[ind] = player
