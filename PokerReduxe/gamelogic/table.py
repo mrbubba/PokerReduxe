@@ -126,7 +126,7 @@ class Table(object):
             if next_seat > len(self.seats):
                 next_seat = 1
         next_player_ind = self.player_order.index(self.seats[next_seat])
-        if next_player_ind > self.player_order.index(player)
+        if next_player_ind > self.player_order.index(player):
             player.missed_bb = True
             player.missed_sb = True
         stack_save = player.stack
