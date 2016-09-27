@@ -76,6 +76,7 @@ class TestTable(unittest.TestCase):
         """ Can a player change to an open seat? """
         self.table.join(1, 'player1', 100)
         self.table.join(2, 'player2', 100)
+        self.table.player_order = [self.table.seats[1], self.table.seats[2]]
         self.table.change_seat(self.table.seats[1], 3)
         self.assertEqual('player1', self.table.seats[3].name)
         self.assertFalse(self.table.seats[1])

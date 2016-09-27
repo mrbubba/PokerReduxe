@@ -5,6 +5,7 @@ from PokerReduxe.gamelogic.card import Card
 from PokerReduxe.gamelogic.pot import Pot
 # from PokerReduxe.gamelogic.lobby import LobbyInstance
 
+
 def get_active_players(table):
     active_players = []
     for player in table.seats.values():
@@ -64,7 +65,7 @@ def new_hand(table):
     # TODO:Include a way to remove game from lobby. Ends Game.
 
     # determine if move or set button
-    #if len(active_players) == 1:
+    # if len(active_players) == 1:
     #   return LobbyInstance.idle_tables.append(table)
     # set button if going from head to head to 3 or more
     if len(active_players) > 2 and len(table.player_order) == 2:

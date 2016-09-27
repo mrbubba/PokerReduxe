@@ -75,6 +75,7 @@ class TestApp(unittest.TestCase):
         app.move_button(self.table)
         self.assertEqual(len(self.table.player_order), 6)
         self.assertEqual(expected, self.table.player_order)
+        self.assertTrue(self.table.seats[4] == self.table.player_order[1])
 
     def test_bb_mia(self):
         """ Can we prepend sb position to None if bb goes mia """
