@@ -25,4 +25,15 @@ class Lobby(object):
         table.join(1, player_name, stack)
         self.tables.append(table)
 
+    def remove_table(self):
+        for table in self.tables:
+            dead = True
+            for seat in table.seats:
+                if seat:
+                    dead = False
+            if dead:
+                self.tables.remove(table)
+                    
+
+
 LobbyInstance = Lobby()
