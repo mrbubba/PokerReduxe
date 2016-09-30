@@ -19,3 +19,8 @@ def socket_server():
         payload = handler(data)
         conn.sendall(payload)
     conn.close()
+
+
+
+if __name__ == '__main__':
+    socket_server()
