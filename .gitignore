@@ -61,3 +61,6 @@ target/
 
 # settings
 .projectsrc
+
+# dev databases
+.sqlite
