@@ -1,9 +1,9 @@
 import random
 
-from PokerReduxe.gamelogic.analyze import analyze
-from PokerReduxe.gamelogic.card import Card
-from PokerReduxe.gamelogic.pot import Pot
-# from PokerReduxe.gamelogic.lobby import LobbyInstance
+from gameserver.gamelogic.analyze import analyze
+from gameserver.gamelogic.card import Card
+from gameserver.gamelogic.pot import Pot
+# from gameserver.gamelogic.lobby import LobbyInstance
 
 
 def get_active_players(table):

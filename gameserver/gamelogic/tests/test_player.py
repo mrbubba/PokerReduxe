@@ -1,8 +1,8 @@
 import unittest
 
 
-from PokerReduxe.gamelogic.table import Table
-from PokerReduxe.gamelogic.pot import Pot
+from gameserver.gamelogic.table import Table
+from gameserver.gamelogic.pot import Pot
 
 
 class TestPlayer(unittest.TestCase):

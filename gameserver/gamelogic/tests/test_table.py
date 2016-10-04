@@ -1,6 +1,6 @@
 import unittest
 
-from PokerReduxe.gamelogic.table import Table
+from gameserver.gamelogic.table import Table
 
 
 

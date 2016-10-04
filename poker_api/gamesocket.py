@@ -1,7 +1,7 @@
 import socket
 from poker_api.handler import handler
 
-from PokerReduxe.gamelogic.lobby import Lobby
+from gameserver.gamelogic.lobby import Lobby
 LobbyInstance = Lobby()
 
 
@@ -11,16 +11,15 @@ def socket_server():
     server_address = ('localhost', 10000)
     s.bind(server_address)
     s.listen(5)
-    conn, addr = s.accept()
     while True:
+        conn, addr = s.accept()
         data = conn.recv(1024)
         if not data:
             break
         payload = handler(data)
+        payload = payload.encode()
         conn.sendall(payload)
     conn.close()
 
 
-
-if __name__ == '__main__':
-    socket_server()
+socket_server()

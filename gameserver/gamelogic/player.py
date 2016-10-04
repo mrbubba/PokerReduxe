@@ -1,4 +1,4 @@
-from PokerReduxe.gamelogic.app import action_time
+from gameserver.gamelogic.app import action_time
 
 
 class Player(object):

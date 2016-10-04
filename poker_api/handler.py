@@ -1,6 +1,6 @@
 import json
 
-from PokerReduxe.gamelogic.lobby import LobbyInstance
+from gameserver.gamelogic.lobby import LobbyInstance
 
 
 def handler_response(table):

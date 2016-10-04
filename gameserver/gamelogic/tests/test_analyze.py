@@ -1,10 +1,10 @@
 import unittest
 
 
-import PokerReduxe.gamelogic.analyze as analyze
-from PokerReduxe.gamelogic.card import Card
-from PokerReduxe.gamelogic.pot import Pot
-from PokerReduxe.gamelogic.table import Table
+import gameserver.gamelogic.analyze as analyze
+from gameserver.gamelogic.card import Card
+from gameserver.gamelogic.pot import Pot
+from gameserver.gamelogic.table import Table
 
 
 class TestAnalyze(unittest.TestCase):

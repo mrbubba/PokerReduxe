@@ -1,4 +1,4 @@
-from PokerReduxe.gamelogic.table import Table
+from gameserver.gamelogic.table import Table
 
 
 class Lobby(object):

@@ -1,9 +1,9 @@
 import json
 import unittest
 
-from PokerReduxe.gamelogic.card import Card
-from PokerReduxe.gamelogic.lobby import LobbyInstance
-from PokerReduxe.gamelogic.pot import Pot
+from gameserver.gamelogic.card import Card
+from gameserver.gamelogic.lobby import LobbyInstance
+from gameserver.gamelogic.pot import Pot
 from poker_api.handler import handler, handler_response
 
 
