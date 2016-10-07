@@ -3,7 +3,7 @@ import json
 from gameserver.gamelogic.lobby import LobbyInstance
 
 
-def handler_response(table):
+def _handler_response(table):
     if table.player_order:
         action_player = [player for player in table.player_order if player.action]
         action_player = action_player[0].name
@@ -15,8 +15,13 @@ def handler_response(table):
     players = {}
     for key, value in table.seats.items():
         if value is not None:
-            players[value.name] = [key, value.stack, value.equity, value.folded, value.active,
-                                   value.hole_cards[0].name, value.hole_cards[1].name]
+            players[value.name] = [key, value.stack, value.equity, value.folded, value.active]
+            if value.hole_cards:
+                players[value.name].append(value.hole_cards[0])
+                players[value.name].append(value.hole_cards[1])
+            else:
+                players[value.name].append('none')
+                players[value.name].append('none')
     pots = []
     if table.pots:
         pot_players = []
@@ -49,7 +54,7 @@ def handler(data):
 
     if d_item == "LOBBY":
         if d_action == "get_lobby":
-            payload = {}
+            payload = dict()
             payload["tables"] = {}
             if LobbyInstance.tables:
                 for table in LobbyInstance.tables:
@@ -67,6 +72,10 @@ def handler(data):
                                        d_data[7])
             return d_data[2]
 
+        elif d_action == "view_table":
+            selected_table = [x for x in LobbyInstance.tables if x.table_name == d_data[0]]
+            _handler_response(selected_table)
+
     table = [table for table in LobbyInstance.tables if table.table_name == d_data[0]]
     table = table[0]
     for key, value in table.seats.items():
@@ -76,18 +85,18 @@ def handler(data):
 
         if d_action == "change_seat":
             table.change_seat(player, d_data[2])
-            return handler_response(table)
+            return _handler_response(table)
 
         elif d_action == "join_table":
             table.join(d_data[2], d_data[1], d_data[3])
-            return handler_response(table)
+            return _handler_response(table)
 
     elif d_item == "PLAYER":
 
         if d_action == "bet":
             player.bet(d_data[2])
-            return handler_response(table)
+            return _handler_response(table)
 
         elif d_action == "fold":
             player.fold()
-            return handler_response(table)
+            return _handler_response(table)

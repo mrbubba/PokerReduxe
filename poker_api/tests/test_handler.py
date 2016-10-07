@@ -4,7 +4,7 @@ import unittest
 from gameserver.gamelogic.card import Card
 from gameserver.gamelogic.lobby import LobbyInstance
 from gameserver.gamelogic.pot import Pot
-from poker_api.handler import handler, handler_response
+from poker_api.handler import handler, _handler_response
 
 
 class TestHandler(unittest.TestCase):
@@ -61,7 +61,7 @@ class TestHandler(unittest.TestCase):
 
     def test_response(self):
         """can we get all of the data for a table object?"""
-        result = handler_response(self.lobby.tables[0])
+        result = _handler_response(self.lobby.tables[0])
         result = json.loads(result)
         expected = {"table": "testable", "table_stats":
             [6, 2, 4, [50, 100], 0, ["King_hearts", "9_hearts", "Jack_hearts"],
