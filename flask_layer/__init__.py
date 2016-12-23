@@ -31,6 +31,7 @@ def create_user_sockets_room_dict(name, sid):
     if not user_sockets[name]:
         user_sockets[name] = sid
 
+# TODO Seperate ROOT route from lobby route
 @app.route('/')
 def lobby_page():
     data = {'item': 'LOBBY', 'action': 'get_lobby', 'data': []}
@@ -75,18 +76,6 @@ def join_table(data):
     create_user_sockets_room_dict(current_user.username, request.sid)
 
 
-
-
-#
-#
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-#
-
-# @socketio.on('my event')
-# def test_message(message):
-#     emit('my response', {'data': 'got it or something'})
 #
 # if __name__ == '__main__':
 #     socketio.run(app)
