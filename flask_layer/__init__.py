@@ -6,7 +6,7 @@ from flask_user import UserManager, SQLAlchemyAdapter
 from flask_login import current_user, login_required
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
-from flask_layer.SockUsers import SockUsers
+# from flask_layer.SockUsers import SockUsers
 
 app = Flask(__name__)
 app.config.from_object('flask_layer.config')

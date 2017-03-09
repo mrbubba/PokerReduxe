@@ -1,0 +1,48 @@
+version: '2'
+services:
+  # Nginx - nginx
+  nginx:
+    build: ./nginx/
+    ports:
+      - 81:80
+    volumes:
+      - ./nginx/logs:/var/log/nginx
+    volumes_from:
+      - web
+    links:
+      - web:web
+
+  # MySQL - db
+  db:
+    image: mysql:5.7
+    hostname: db
+    environment:
+      - "MYSQL_ROOT_PASSWORD=mysql"
+      - "MYSQL_DATABASE=poker_reduxe"
+    ports:
+      - 3307:3306
+  
+#   # Memcached - memcached
+#   memcached:
+#     image: memcached
+#     hostname: memcached
+#     ports:
+#       - "11211:11211"
+#     command: "/usr/local/bin/memcached -u memcache -vv"
+  
+  # Flask - web
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: web
+    environment:
+      - FLASK_APP=flask_layer/__init__.py
+    command: flask run
+    volumes:
+      - .:/app 
+    ports:
+      - "8001:5000"
+    links:
+      - db
+
