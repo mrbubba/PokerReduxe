@@ -1,11 +1,10 @@
 import unittest
-from gameserver.gamelogic.card import Card
 from brain.myhand.hand_analysis import *
-
+from gameserver.gamelogic.card import Card
 
 class TestAnalyze(unittest.TestCase):
 
-    def cards_are_properly_removed_from_deck(self):
+    def test_cards_are_properly_removed_from_deck(self):
 
         common_cards = []
         common_cards.append(Card("Ace_Diamonds", 14, "d"))
@@ -19,3 +18,5 @@ class TestAnalyze(unittest.TestCase):
 
 
 
+if __name__ == '__main__':
+    unittest.main()

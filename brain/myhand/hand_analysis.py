@@ -11,15 +11,14 @@ def create_deck():
 
     for value in range(2, 15):
 
-        if value > 10:
-            if value == 11:
-                name = 'Jack'
-            elif value == 12:
-                name = 'Queen'
-            elif value == 13:
-                name = 'King'
-            elif value == 14:
-                name = 'Ace'
+        if value == 11:
+            name = 'Jack'
+        elif value == 12:
+            name = 'Queen'
+        elif value == 13:
+            name = 'King'
+        elif value == 14:
+            name = 'Ace'
         else:
             name = str(value)
 
@@ -31,11 +30,18 @@ def create_deck():
 
 def hand_order(community_cards):
     """Orders every possible permutation of hole cards, and sorts them. Returns a list from best to worst."""
-    vdeck = create_deck()
+
+    create_deck()
+
+    for card in community_cards:
+        for i, o in enumerate(deck):
+            if o.name == card.name:
+                del deck[i]
 
 
 
-    pass
 
 
 
+
+__all__ = ['deck', 'create_deck', 'hand_order']
