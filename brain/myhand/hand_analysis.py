@@ -1,6 +1,4 @@
 from gameserver.gamelogic.card import Card
-from gameserver.gamelogic.player import Player
-
 
 deck = []
 
@@ -37,11 +35,6 @@ def hand_order(community_cards):
         for i, o in enumerate(deck):
             if o.name == card.name:
                 del deck[i]
-
-
-
-
-
 
 
 __all__ = ['deck', 'create_deck', 'hand_order']
